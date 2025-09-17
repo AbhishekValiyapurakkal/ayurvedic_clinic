@@ -1,71 +1,128 @@
-class Patient {
+class PatientDetail {
   final int id;
-  final String name;
-  final String whatsappNumber;
-  final String address;
-  final String location;
-  final String branch;
-  final String treatments;
-  final double totalAmount;
-  final double discountAmount;
-  final String paymentOption;
-  final double advanceAmount;
-  final double balanceAmount;
-  final String treatmentDate;
-  final String treatmentTime;
+  final String male;
+  final String female;
+  final int patientId;
+  final String? treatment;
 
-  Patient({
+  PatientDetail({
     required this.id,
-    required this.name,
-    required this.whatsappNumber,
-    required this.address,
-    required this.location,
-    required this.branch,
-    required this.treatments,
-    required this.totalAmount,
-    required this.discountAmount,
-    required this.paymentOption,
-    required this.advanceAmount,
-    required this.balanceAmount,
-    required this.treatmentDate,
-    required this.treatmentTime,
+    required this.male,
+    required this.female,
+    required this.patientId,
+    this.treatment,
   });
 
-  factory Patient.fromJson(Map<String, dynamic> json) {
-    return Patient(
+  factory PatientDetail.fromJson(Map<String, dynamic> json) {
+    return PatientDetail(
       id: json['id'],
-      name: json['name'],
-      whatsappNumber: json['whatsapp_number'],
-      address: json['address'],
-      location: json['location'],
-      branch: json['branch'],
-      treatments: json['treatments'],
-      totalAmount: double.tryParse(json['total_amount'].toString()) ?? 0.0,
-      discountAmount: double.tryParse(json['discount_amount'].toString()) ?? 0.0,
-      paymentOption: json['payment_option'],
-      advanceAmount: double.tryParse(json['advance_amount'].toString()) ?? 0.0,
-      balanceAmount: double.tryParse(json['balance_amount'].toString()) ?? 0.0,
-      treatmentDate: json['treatment_date'],
-      treatmentTime: json['treatment_time'],
+      male: json['male'] ?? "",
+      female: json['female'] ?? "",
+      patientId: json['patient'],
+      treatment: json['treatment'],
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'id': id.toString(),
-      'name': name,
-      'whatsapp_number': whatsappNumber,
-      'address': address,
-      'location': location,
+      'id': id,
+      'male': male,
+      'female': female,
+      'patient': patientId,
+      'treatment': treatment,
+    };
+  }
+}
+
+class Patient {
+  final int id;
+  final List<PatientDetail> patientDetails;
+  final String? branch;
+  final String user;
+  final String payment;
+  final String name;
+  final String phone;
+  final String address;
+  final double? price;
+  final double totalAmount;
+  final double discountAmount;
+  final double advanceAmount;
+  final double balanceAmount;
+  final String? dateAndTime;
+  final bool isActive;
+  final String createdAt;
+  final String updatedAt;
+
+  Patient({
+    required this.id,
+    required this.patientDetails,
+    this.branch,
+    required this.user,
+    required this.payment,
+    required this.name,
+    required this.phone,
+    required this.address,
+    this.price,
+    required this.totalAmount,
+    required this.discountAmount,
+    required this.advanceAmount,
+    required this.balanceAmount,
+    this.dateAndTime,
+    required this.isActive,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+
+  factory Patient.fromJson(Map<String, dynamic> json) {
+    return Patient(
+      id: json['id'],
+      patientDetails: (json['patientdetails_set'] as List<dynamic>?)
+              ?.map((e) => PatientDetail.fromJson(e))
+              .toList() ??
+          [],
+      branch: json['branch'],
+      user: json['user'] ?? "",
+      payment: json['payment'] ?? "",
+      name: json['name'] ?? "",
+      phone: json['phone'] ?? "",
+      address: json['address'] ?? "",
+      price: json['price'] != null
+          ? double.tryParse(json['price'].toString())
+          : null,
+      totalAmount:
+          double.tryParse(json['total_amount'].toString()) ?? 0.0,
+      discountAmount:
+          double.tryParse(json['discount_amount'].toString()) ?? 0.0,
+      advanceAmount:
+          double.tryParse(json['advance_amount'].toString()) ?? 0.0,
+      balanceAmount:
+          double.tryParse(json['balance_amount'].toString()) ?? 0.0,
+      dateAndTime: json['date_nd_time'],
+      isActive: json['is_active'] ?? false,
+      createdAt: json['created_at'] ?? "",
+      updatedAt: json['updated_at'] ?? "",
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'patientdetails_set': patientDetails.map((e) => e.toJson()).toList(),
       'branch': branch,
-      'treatments': treatments,
-      'total_amount': totalAmount.toString(),
-      'discount_amount': discountAmount.toString(),
-      'payment_option': paymentOption,
-      'advance_amount': advanceAmount.toString(),
-      'balance_amount': balanceAmount.toString(),
-      'treatment_date': treatmentDate,
-      'treatment_time': treatmentTime,
+      'user': user,
+      'payment': payment,
+      'name': name,
+      'phone': phone,
+      'address': address,
+      'price': price,
+      'total_amount': totalAmount,
+      'discount_amount': discountAmount,
+      'advance_amount': advanceAmount,
+      'balance_amount': balanceAmount,
+      'date_nd_time': dateAndTime,
+      'is_active': isActive,
+      'created_at': createdAt,
+      'updated_at': updatedAt,
     };
   }
 

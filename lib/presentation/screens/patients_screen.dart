@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import 'package:ayurvedic_clinic_app/presentation/providers/patients_provider.dart';
 
 class PatientsScreen extends StatefulWidget {
   const PatientsScreen({super.key});
@@ -12,6 +14,19 @@ class _PatientsScreenState extends State<PatientsScreen> {
   String? selectedValue; // null so hint 'Date' shows initially
 
   final List<String> options = ["This Week", "This Month", "This Year"];
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await context.read<PatientProvider>().fetchPatients();
+      final patients = context.read<PatientProvider>().patients;
+      print('Patients fetched: ${patients.length}');
+      for (final patient in patients) {
+        print('Patient: ${patient.id} - ${patient.name}');
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

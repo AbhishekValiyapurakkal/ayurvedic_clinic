@@ -22,9 +22,17 @@ class PatientProvider with ChangeNotifier {
     notifyListeners();
 
     try {
-      _patients = await apiService.getPatients();
-    } catch (e) {
+      final patientsList = await apiService.getPatients();
+
+      if (patientsList.isEmpty) {
+        _error = "No patients found"; 
+      }
+
+      _patients = patientsList;
+    } catch (e, stack) {
       _error = "Failed to load patients: $e";
+      debugPrint("Error in fetchPatients: $e");
+      debugPrint("Stack trace: $stack"); 
       _patients = [];
     } finally {
       _isLoading = false;
