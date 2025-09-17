@@ -1,5 +1,7 @@
+import 'package:ayurvedic_clinic_app/data/models/branch_model.dart';
 import 'package:ayurvedic_clinic_app/data/models/register_patients_model.dart';
 import 'package:ayurvedic_clinic_app/data/models/treatment_model.dart';
+import 'package:ayurvedic_clinic_app/presentation/providers/branch_provider.dart';
 import 'package:ayurvedic_clinic_app/presentation/providers/registerPatients_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -45,8 +47,8 @@ class _RegisterSceenState extends State<RegisterSceen> {
     (index) => (index + 1).toString(),
   );
 
-  String? selectedValue1;
-  String? selectedValue2;
+  String? selectedlocation;
+  Branch? selectedBranch;
 
   String? selectedTreatmentValue;
   String? selectedTreatmentId;
@@ -587,7 +589,7 @@ class _RegisterSceenState extends State<RegisterSceen> {
                           borderRadius: BorderRadius.circular(8.53),
                         ),
                         child: DropdownButton<String>(
-                          value: selectedValue1,
+                          value: selectedlocation,
                           isExpanded: true,
                           hint: Text(
                             'Choose your location',
@@ -610,7 +612,7 @@ class _RegisterSceenState extends State<RegisterSceen> {
                           }).toList(),
                           onChanged: (String? newValue) {
                             setState(() {
-                              selectedValue1 = newValue;
+                              selectedlocation = newValue;
                             });
                           },
                           underline: Container(),
@@ -628,48 +630,61 @@ class _RegisterSceenState extends State<RegisterSceen> {
                           fontSize: 16,
                         ),
                       ),
-                      Container(
-                        width: screenWidth * (350 / 414),
-                        height: screenHeight * (50 / 896),
-                        padding: EdgeInsets.symmetric(horizontal: 24),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Color(0x40D9D9D9)),
-                          borderRadius: BorderRadius.circular(8.53),
-                        ),
-                        child: DropdownButton<String>(
-                          value: selectedValue2,
-                          isExpanded: true,
-                          hint: Text(
-                            'Choose your branch',
-                            style: GoogleFonts.poppins(
-                              fontWeight: FontWeight.w400,
-                              fontSize: 15,
-                            ),
-                          ),
-                          items: branch.map((String value) {
-                            return DropdownMenuItem<String>(
-                              value: value,
-                              child: Text(
-                                value,
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
+                      Consumer<BranchProvider>(
+                        builder: (context, branchProvider, child) {
+                          if (branchProvider.isLoading) {
+                            return CircularProgressIndicator();
+                          } else if (branchProvider.error != null) {
+                            return Text('Error: ${branchProvider.error}');
+                          } else {
+                            return Container(
+                              width:
+                                  MediaQuery.of(context).size.width *
+                                  (350 / 414),
+                              height:
+                                  MediaQuery.of(context).size.height *
+                                  (50 / 896),
+                              padding: EdgeInsets.symmetric(horizontal: 24),
+                              decoration: BoxDecoration(
+                                border: Border.all(color: Color(0x40D9D9D9)),
+                                borderRadius: BorderRadius.circular(8.53),
+                              ),
+                              child: DropdownButton<Branch>(
+                                value:
+                                    selectedBranch, // must be null or in items
+                                isExpanded: true,
+                                hint: Text(
+                                  'Choose your branch',
+                                  style: TextStyle(fontSize: 15),
+                                ),
+                                items: branchProvider.branches.map((branch) {
+                                  return DropdownMenuItem<Branch>(
+                                    value: branch,
+                                    child: Text(
+                                      branch.name,
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  );
+                                }).toList(),
+                                onChanged: (Branch? newBranch) {
+                                  setState(() {
+                                    selectedBranch = newBranch;
+                                  });
+                                },
+                                underline: Container(),
+                                icon: Icon(
+                                  Icons.keyboard_arrow_down,
+                                  color: Colors.black,
                                 ),
                               ),
                             );
-                          }).toList(),
-                          onChanged: (String? newValue) {
-                            setState(() {
-                              selectedValue2 = newValue;
-                            });
-                          },
-                          underline: Container(),
-                          icon: Icon(
-                            Icons.keyboard_arrow_down,
-                            color: Colors.black,
-                          ),
-                        ),
+                          }
+                        },
                       ),
+
                       SizedBox(height: 20),
                       Text(
                         'Treatments',
@@ -1164,7 +1179,7 @@ class _RegisterSceenState extends State<RegisterSceen> {
                                   id: "",
                                   male: selectedMaleCount.toString(),
                                   female: selectedFemaleCount.toString(),
-                                  branch: selectedValue2 ?? "",
+                                  branch: selectedBranch?.name ?? "",
                                   treatments:
                                       selectedTreatmentId ??
                                       "", // Use ID instead of name
