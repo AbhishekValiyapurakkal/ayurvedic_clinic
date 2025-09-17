@@ -42,7 +42,7 @@ dependencies:
   intl: ^0.20.2
   printing: ^5.14.2
   path_provider: ^2.1.5
-  
+
   
   
 
@@ -100,3 +100,4 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+  
