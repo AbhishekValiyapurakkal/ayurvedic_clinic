@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:ayurvedic_clinic_app/data/models/branch_model.dart';
 import 'package:ayurvedic_clinic_app/data/models/register_patients_model.dart';
 import 'package:ayurvedic_clinic_app/data/models/treatment_model.dart';
@@ -5,6 +7,11 @@ import 'package:ayurvedic_clinic_app/presentation/providers/branch_provider.dart
 import 'package:ayurvedic_clinic_app/presentation/providers/registerPatients_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart';
 import 'package:provider/provider.dart';
 import 'package:ayurvedic_clinic_app/presentation/providers/patients_provider.dart';
 
@@ -59,23 +66,254 @@ class _RegisterSceenState extends State<RegisterSceen> {
   final List<String> location = ["banglore", "kochi", "chennai", "malappuram"];
   final List<String> branch = ["banglore", "kochi", "chennai", "malappuram"];
 
+  Future<void> _generateAndSharePDF() async {
+    final pdf = pw.Document();
+
+    final bookedDate = DateFormat('dd/MM/yyyy').format(DateTime.now());
+    final bookedTime = DateFormat('hh:mma').format(DateTime.now());
+    final treatmentDate = _treatmentdate.text.isNotEmpty
+        ? _treatmentdate.text
+        : DateFormat('dd/MM/yyyy').format(DateTime.now());
+    final treatmentTime = selectedHour != null && selectedMinute != null
+        ? '$selectedHour:${selectedMinute!.padLeft(2, '0')} ${int.parse(selectedHour!) < 12 ? 'am' : 'pm'}'
+        : 'Not specified';
+
+    double totalAmount = double.tryParse(_totalamount.text) ?? 0;
+    double discountAmount = double.tryParse(_discountamount.text) ?? 0;
+    double advanceAmount = double.tryParse(_advanceamount.text) ?? 0;
+    double balanceAmount = double.tryParse(_balanceamount.text) ?? 0;
+
+    if (totalAmount == 0 && selectedTreatmentValue != null) {
+      totalAmount = (selectedMaleCount + selectedFemaleCount) * 230;
+    }
+
+    pdf.addPage(
+      pw.Page(
+        pageFormat: PdfPageFormat.a4,
+        build: (pw.Context context) {
+          return pw.Column(
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            children: [
+              pw.Center(
+                child: pw.Column(
+                  children: [
+                    pw.Text(
+                      'KUMARAKOM',
+                      style: pw.TextStyle(
+                        fontSize: 18,
+                        fontWeight: pw.FontWeight.bold,
+                      ),
+                    ),
+                    pw.SizedBox(height: 4),
+                    pw.Text(
+                      'Cheepunkal PO. Kumarakom, kottayam, Kerala - 686563',
+                      style: pw.TextStyle(fontSize: 10),
+                    ),
+                    pw.SizedBox(height: 4),
+                    pw.Text(
+                      'e-mail: unknown@gmail.com',
+                      style: pw.TextStyle(fontSize: 10),
+                    ),
+                    pw.SizedBox(height: 4),
+                    pw.Text(
+                      'Mob: +91 9876543210 | +91 9786543210',
+                      style: pw.TextStyle(fontSize: 10),
+                    ),
+                    pw.SizedBox(height: 4),
+                    pw.Text(
+                      'GST No: 32AABCU9603R1ZW',
+                      style: pw.TextStyle(fontSize: 10),
+                    ),
+                  ],
+                ),
+              ),
+
+              pw.Divider(thickness: 1),
+              pw.SizedBox(height: 10),
+
+              pw.Text(
+                'Patient Details',
+                style: pw.TextStyle(
+                  fontSize: 14,
+                  fontWeight: pw.FontWeight.bold,
+                ),
+              ),
+              pw.SizedBox(height: 10),
+
+              pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                children: [
+                  pw.Column(
+                    crossAxisAlignment: pw.CrossAxisAlignment.start,
+                    children: [
+                      pw.Text('Name    ${_name.text}'),
+                      pw.SizedBox(height: 4),
+                      pw.Text('Address    ${_address.text}'),
+                      pw.SizedBox(height: 4),
+                      pw.Text('WhatsApp Number    ${_whatsappnumber.text}'),
+                    ],
+                  ),
+                  pw.Column(
+                    crossAxisAlignment: pw.CrossAxisAlignment.start,
+                    children: [
+                      pw.Text('Booked On   $bookedDate   |  $bookedTime'),
+                      pw.SizedBox(height: 4),
+                      pw.Text('Treatment Date    $treatmentDate'),
+                      pw.SizedBox(height: 4),
+                      pw.Text('Treatment Time    $treatmentTime'),
+                    ],
+                  ),
+                ],
+              ),
+
+              pw.SizedBox(height: 20),
+              pw.Divider(thickness: 1),
+              pw.SizedBox(height: 10),
+
+              pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                children: [
+                  pw.Text(
+                    'Treatment',
+                    style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                  ),
+                  pw.Text(
+                    'Price',
+                    style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                  ),
+                  pw.Text(
+                    'Male',
+                    style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                  ),
+                  pw.Text(
+                    'Female',
+                    style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                  ),
+                  pw.Text(
+                    'Total',
+                    style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                  ),
+                ],
+              ),
+
+              pw.Divider(thickness: 0.5),
+              pw.SizedBox(height: 8),
+
+              if (selectedTreatmentValue != null)
+                pw.Row(
+                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                  children: [
+                    pw.Text(selectedTreatmentValue!),
+                    pw.Text('₹230'),
+                    pw.Text('$selectedMaleCount'),
+                    pw.Text('$selectedFemaleCount'),
+                    pw.Text(
+                      '₹${(selectedMaleCount + selectedFemaleCount) * 230}',
+                    ),
+                  ],
+                ),
+
+              pw.SizedBox(height: 20),
+              pw.Divider(thickness: 1),
+              pw.SizedBox(height: 10),
+
+              pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                children: [
+                  pw.Text('Total Amount'),
+                  pw.Text('₹${totalAmount.toStringAsFixed(2)}'),
+                ],
+              ),
+              pw.SizedBox(height: 8),
+              pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                children: [
+                  pw.Text('Discount'),
+                  pw.Text('₹${discountAmount.toStringAsFixed(2)}'),
+                ],
+              ),
+              pw.SizedBox(height: 8),
+              pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                children: [
+                  pw.Text('Advance'),
+                  pw.Text('₹${advanceAmount.toStringAsFixed(2)}'),
+                ],
+              ),
+              pw.SizedBox(height: 8),
+              pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                children: [
+                  pw.Text('Balance'),
+                  pw.Text('₹${balanceAmount.toStringAsFixed(2)}'),
+                ],
+              ),
+
+              pw.SizedBox(height: 30),
+
+              pw.Center(
+                child: pw.Column(
+                  children: [
+                    pw.Text(
+                      'Thank you for choosing us',
+                      style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                    ),
+                    pw.SizedBox(height: 8),
+                    pw.Text(
+                      'Your well-being is our commitment, and we\'re honored',
+                      style: pw.TextStyle(fontSize: 10),
+                    ),
+                    pw.Text(
+                      'you\'ve entrusted us with your health journey',
+                      style: pw.TextStyle(fontSize: 10),
+                    ),
+                    pw.SizedBox(height: 15),
+                    pw.Text(
+                      'Ask to edit',
+                      style: pw.TextStyle(
+                        fontSize: 10,
+                        fontStyle: pw.FontStyle.italic,
+                      ),
+                    ),
+                    pw.SizedBox(height: 15),
+                    pw.Text(
+                      'It\'s important to arrive on the allotted time for your treatment*',
+                      style: pw.TextStyle(
+                        fontSize: 10,
+                        fontStyle: pw.FontStyle.italic,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+
+    final output = await getTemporaryDirectory();
+    final file = File("${output.path}/patient_receipt.pdf");
+    await file.writeAsBytes(await pdf.save());
+    await Printing.sharePdf(
+      bytes: await pdf.save(),
+      filename: 'patient_receipt.pdf',
+    );
+  }
+
   void _showTreatmentDialog() async {
     final registerProvider = context.read<RegisterPatientProvider>();
 
-    // Show loading dialog first
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) => Center(child: CircularProgressIndicator()),
     );
 
-    // Fetch treatments
     await registerProvider.fetchTreatments();
 
-    // Close the loading dialog
     Navigator.of(context).pop();
 
-    // Now show the actual treatment dialog
     final Size screenSize = MediaQuery.of(context).size;
     double screenWidth = screenSize.width;
     double screenHeight = screenSize.height;
@@ -109,7 +347,6 @@ class _RegisterSceenState extends State<RegisterSceen> {
                         SizedBox(height: 10),
                         ElevatedButton(
                           onPressed: () async {
-                            // Show loading
                             showDialog(
                               context: context,
                               barrierDismissible: false,
@@ -153,7 +390,7 @@ class _RegisterSceenState extends State<RegisterSceen> {
                               return DropdownMenuItem<Treatment>(
                                 value: treatment,
                                 child: Text(
-                                  '${treatment.name} - ₹${treatment.price}',
+                                  '${treatment.name} - ₹ ${treatment.price}',
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w500,
@@ -734,8 +971,6 @@ class _RegisterSceenState extends State<RegisterSceen> {
                                       ),
                                     ),
                                   );
-
-                                  
                                 }).toList(),
                                 onChanged: (Branch? newBranch) {
                                   setState(() {
@@ -1225,52 +1460,97 @@ class _RegisterSceenState extends State<RegisterSceen> {
                                 ),
                               ),
                               onPressed: () async {
-                                final provider = context
-                                    .read<RegisterPatientProvider>();
+                                try {
+                                  // Generate PDF first (before API call)
+                                  await _generateAndSharePDF();
 
-                                final request = RegisterPatientRequest(
-                                  name: _name.text.trim(),
-                                  excecutive: "",
-                                  payment: selectedPaymentOption ?? "Cash",
-                                  phone: _whatsappnumber.text.trim(),
-                                  address: _address.text.trim(),
-                                  totalAmount:
-                                      double.tryParse(_totalamount.text) ?? 0,
-                                  discountAmount:
-                                      double.tryParse(_discountamount.text) ??
-                                      0,
-                                  advanceAmount:
-                                      double.tryParse(_advanceamount.text) ?? 0,
-                                  balanceAmount:
-                                      double.tryParse(_balanceamount.text) ?? 0,
-                                  dateAndTime: DateTime.now().toIso8601String(),
-                                  id: "",
-                                  male: selectedMaleCount.toString(),
-                                  female: selectedFemaleCount.toString(),
-                                  branch: selectedBranch?.name ?? "",
-                                  treatments: selectedTreatmentId ?? "",
-                                );
+                                  // Then try to register patient
+                                  final provider = context
+                                      .read<RegisterPatientProvider>();
+                                  final request = RegisterPatientRequest(
+                                    name: _name.text.trim(),
+                                    excecutive: "",
+                                    payment: selectedPaymentOption ?? "Cash",
+                                    phone: _whatsappnumber.text.trim(),
+                                    address: _address.text.trim(),
+                                    totalAmount:
+                                        double.tryParse(_totalamount.text) ?? 0,
+                                    discountAmount:
+                                        double.tryParse(_discountamount.text) ??
+                                        0,
+                                    advanceAmount:
+                                        double.tryParse(_advanceamount.text) ??
+                                        0,
+                                    balanceAmount:
+                                        double.tryParse(_balanceamount.text) ??
+                                        0,
+                                    dateAndTime: DateTime.now()
+                                        .toIso8601String(),
+                                    id: "",
+                                    male: selectedMaleCount.toString(),
+                                    female: selectedFemaleCount.toString(),
+                                    branch: selectedBranch?.name ?? "",
+                                    treatments: selectedTreatmentId ?? "",
+                                  );
 
-                                await provider.registerPatient(request);
-
-                                if (provider.success) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                        "Patient registered successfully!",
+                                  // Show loading for API call only
+                                  showDialog(
+                                    context: context,
+                                    barrierDismissible: false,
+                                    builder: (context) => Center(
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          CircularProgressIndicator(),
+                                          SizedBox(height: 16),
+                                          Text("Registering patient..."),
+                                        ],
                                       ),
                                     ),
                                   );
+
+                                  await provider.registerPatient(request);
+
+                                  // Close loading dialog
+                                  Navigator.of(context).pop();
+
+                                  if (provider.success) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          "Patient registered successfully!",
+                                        ),
+                                        backgroundColor: Colors.green,
+                                      ),
+                                    );
+                                  } else {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          "PDF generated but server error: ${provider.errorMessage}",
+                                        ),
+                                        backgroundColor: Colors.orange,
+                                        duration: Duration(seconds: 5),
+                                      ),
+                                    );
+                                  }
+
                                   Navigator.pop(context);
-                                } else {
+                                } catch (e) {
+                                  // Close loading dialog if it's still open
+                                  if (Navigator.of(context).canPop()) {
+                                    Navigator.of(context).pop();
+                                  }
+
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
-                                      content: Text(
-                                        provider.errorMessage ??
-                                            "Something went wrong",
-                                      ),
+                                      content: Text("Error: ${e.toString()}"),
+                                      backgroundColor: Colors.red,
+                                      duration: Duration(seconds: 5),
                                     ),
                                   );
+
+                                  print("Error details: $e");
                                 }
                               },
 

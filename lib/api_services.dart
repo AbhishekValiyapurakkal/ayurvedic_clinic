@@ -127,7 +127,6 @@ class ApiService {
     if (response.statusCode == 200 && response.data != null) {
       final Map<String, dynamic> responseData = response.data;
       
-      // Use TreatmentResponse to parse the structured response
       final treatmentResponse = TreatmentResponse.fromJson(responseData);
       
       if (treatmentResponse.status) {

@@ -195,7 +195,7 @@ class _PatientsScreenState extends State<PatientsScreen> {
                           },
                           child: ListView.builder(
                             physics:
-                                const AlwaysScrollableScrollPhysics(), // ensures refresh works even if list is short
+                                const AlwaysScrollableScrollPhysics(), 
                             padding: const EdgeInsets.only(bottom: 90),
                             itemCount: patients.length,
                             itemBuilder: (context, index) {

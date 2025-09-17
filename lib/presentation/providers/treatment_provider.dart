@@ -16,7 +16,6 @@ class TreatmentProvider with ChangeNotifier {
   String? _error;
   String? get error => _error;
 
-  // Fetch treatment list
   Future<void> fetchTreatments() async {
     _isLoading = true;
     _error = null;

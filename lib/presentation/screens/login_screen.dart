@@ -41,7 +41,7 @@ class _LoginScreenState extends State<LoginScreen> {
             Container(
               height: screenHeight * (217 / 896),
               width: screenWidth,
-              color: Colors.tealAccent,
+              color: Colors.transparent,
               child: Stack(
                 children: [
                   Image.asset(
@@ -205,7 +205,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                           .token;
                                       print('Token: $token');
 
-                                      // ✅ CRITICAL: Set the token in RegisterPatientProvider
                                       final registerProvider = context
                                           .read<RegisterPatientProvider>();
                                       registerProvider.setToken(token!);
@@ -246,7 +245,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         SizedBox(height: 104),
                         Container(
-                          height: screenHeight * (42 / 896),
+                          height: screenHeight * (55 / 896),
                           width: screenHeight * (350 / 414),
                           color: Colors.transparent,
                           child: RichText(
