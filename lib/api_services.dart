@@ -35,20 +35,21 @@ class ApiService {
   }
 
    Future<List<Patient>> getPatients() async {
-    try {
-      final response = await _dio.get("PatientList");
+  try {
+    final response = await _dio.get("PatientList");
 
-      if (response.statusCode == 200 && response.data != null) {
-        final List<dynamic> data = response.data;
-        return Patient.fromJsonList(data);
-      } else {
-        return [];
-      }
-    } catch (e) {
-      print("Error fetching patients: $e");
+    if (response.statusCode == 200 && response.data != null) {
+      final List<dynamic> data = response.data["patient"] ?? [];
+      return Patient.fromJsonList(data);
+    } else {
       return [];
     }
+  } catch (e) {
+    print("Error fetching patients: $e");
+    return [];
   }
+}
+
 
   Future<bool> updatePatient(Map<String, dynamic> patientData) async {
     final response = await _dio.post(
