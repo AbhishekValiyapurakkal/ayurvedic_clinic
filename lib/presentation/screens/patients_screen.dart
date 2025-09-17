@@ -12,7 +12,7 @@ class PatientsScreen extends StatefulWidget {
 }
 
 class _PatientsScreenState extends State<PatientsScreen> {
-  String? selectedValue; // null so hint 'Date' shows initially
+  String? selectedValue;
 
   final List<String> options = ["This Week", "This Month", "This Year"];
 
