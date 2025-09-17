@@ -1,6 +1,7 @@
 import 'package:ayurvedic_clinic_app/api_services.dart';
 import 'package:ayurvedic_clinic_app/presentation/providers/auth_provider.dart';
 import 'package:ayurvedic_clinic_app/presentation/providers/patients_provider.dart';
+import 'package:ayurvedic_clinic_app/presentation/screens/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -23,9 +24,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Scaffold(
-        body: Center(child: Text("Ayurvedic Clinic App")),
-      ),
+      home: SplashScreen(),
     );
   }
 }
