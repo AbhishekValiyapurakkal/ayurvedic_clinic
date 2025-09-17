@@ -1,6 +1,9 @@
 import 'package:ayurvedic_clinic_app/api_services.dart';
 import 'package:ayurvedic_clinic_app/presentation/screens/login_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:ayurvedic_clinic_app/presentation/providers/auth_provider.dart';
+import 'package:ayurvedic_clinic_app/presentation/screens/patients_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   final ApiService apiService;
@@ -19,11 +22,20 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   void _navigateToLogin() async {
-    await Future.delayed(Duration(seconds: 3));
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (_) => LoginScreen()),
-    );
+    await context.read<AuthProvider>().initialize();
+    await Future.delayed(Duration(seconds: 2));
+    final bool isLoggedIn = context.read<AuthProvider>().isAuthenticated;
+    if (isLoggedIn) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => PatientsScreen()),
+      );
+    } else {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => LoginScreen()),
+      );
+    }
   }
 
   @override

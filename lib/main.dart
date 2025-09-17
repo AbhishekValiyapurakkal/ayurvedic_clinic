@@ -2,6 +2,7 @@ import 'package:ayurvedic_clinic_app/api_services.dart';
 import 'package:ayurvedic_clinic_app/presentation/providers/branch_provider.dart';
 import 'package:ayurvedic_clinic_app/presentation/providers/patients_provider.dart';
 import 'package:ayurvedic_clinic_app/presentation/providers/treatment_provider.dart';
+import 'package:ayurvedic_clinic_app/presentation/providers/auth_provider.dart';
 import 'package:ayurvedic_clinic_app/presentation/screens/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -17,6 +18,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(
           create: (_) => PatientProvider(apiService: apiService),
         ),

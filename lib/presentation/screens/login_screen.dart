@@ -1,6 +1,9 @@
+import 'package:ayurvedic_clinic_app/presentation/screens/patients_screen.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import 'package:ayurvedic_clinic_app/presentation/providers/auth_provider.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -10,11 +13,23 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final Size screenSize = MediaQuery.of(context).size;
     double screenWidth = screenSize.width;
     double screenHeight = screenSize.height;
+
+    final auth = context.watch<AuthProvider>();
 
     return Scaffold(
       body: SingleChildScrollView(
@@ -89,6 +104,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         SizedBox(
                           height: screenHeight * (50 / 896),
                           child: TextField(
+                            controller: _emailController,
                             decoration: InputDecoration(
                               border: OutlineInputBorder(
                                 borderSide: BorderSide(
@@ -124,6 +140,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         SizedBox(
                           height: screenHeight * (50 / 896),
                           child: TextField(
+                            controller: _passwordController,
+                            obscureText: true,
                             decoration: InputDecoration(
                               border: OutlineInputBorder(
                                 borderSide: BorderSide(
@@ -156,7 +174,54 @@ class _LoginScreenState extends State<LoginScreen> {
                                 borderRadius: BorderRadius.circular(8.52),
                               ),
                             ),
-                            onPressed: () {},
+                            onPressed: auth.isLoading
+                                ? null
+                                : () async {
+                                    final email = _emailController.text.trim();
+                                    final password = _passwordController.text
+                                        .trim();
+                                    if (email.isEmpty || password.isEmpty) {
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            'Enter email and password',
+                                          ),
+                                        ),
+                                      );
+                                      return;
+                                    }
+                                    final success = await context
+                                        .read<AuthProvider>()
+                                        .login(email, password);
+                                    if (success) {
+                                      final token = context
+                                          .read<AuthProvider>()
+                                          .token;
+                                      print('Token: $token');
+                                      Navigator.pushReplacement(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              PatientsScreen(),
+                                        ),
+                                      );
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        SnackBar(
+                                          content: Text('Login success'),
+                                        ),
+                                      );
+                                    } else {
+                                      ScaffoldMessenger.of(
+                                        context,
+                                      ).showSnackBar(
+                                        SnackBar(content: Text('Login failed')),
+                                      );
+                                    }
+                                  },
                             child: Text(
                               'Login',
                               style: GoogleFonts.poppins(
