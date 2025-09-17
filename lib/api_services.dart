@@ -4,7 +4,9 @@ import 'package:ayurvedic_clinic_app/data/models/treatment_model.dart';
 import 'package:dio/dio.dart';
 
 class ApiService {
-  final Dio _dio = Dio(BaseOptions(baseUrl: "https://flutter-amr.noviindus.in/api/"));
+  final Dio _dio = Dio(
+    BaseOptions(baseUrl: "https://flutter-amr.noviindus.in/api/"),
+  );
 
   String? _token;
 
@@ -17,10 +19,7 @@ class ApiService {
     try {
       final response = await _dio.post(
         "Login",
-        data: FormData.fromMap({
-          "username": username,
-          "password": password,
-        }),
+        data: FormData.fromMap({"username": username, "password": password}),
       );
 
       if (response.statusCode == 200) {
@@ -34,22 +33,21 @@ class ApiService {
     return null;
   }
 
-   Future<List<Patient>> getPatients() async {
-  try {
-    final response = await _dio.get("PatientList");
+  Future<List<Patient>> getPatients() async {
+    try {
+      final response = await _dio.get("PatientList");
 
-    if (response.statusCode == 200 && response.data != null) {
-      final List<dynamic> data = response.data["patient"] ?? [];
-      return Patient.fromJsonList(data);
-    } else {
+      if (response.statusCode == 200 && response.data != null) {
+        final List<dynamic> data = response.data["patient"] ?? [];
+        return Patient.fromJsonList(data);
+      } else {
+        return [];
+      }
+    } catch (e) {
+      print("Error fetching patients: $e");
       return [];
     }
-  } catch (e) {
-    print("Error fetching patients: $e");
-    return [];
   }
-}
-
 
   Future<bool> updatePatient(Map<String, dynamic> patientData) async {
     final response = await _dio.post(
@@ -60,33 +58,31 @@ class ApiService {
   }
 
   Future<List<Branch>> getBranches() async {
-  try {
-    final response = await _dio.get("BranchList");
+    try {
+      final response = await _dio.get("BranchList");
 
-    if (response.statusCode == 200 && response.data != null) {
-      return Branch.fromJsonList(response.data);
-    } else {
+      if (response.statusCode == 200 && response.data != null) {
+        return Branch.fromJsonList(response.data);
+      } else {
+        return [];
+      }
+    } catch (e) {
+      print("Error fetching branches: $e");
       return [];
     }
-  } catch (e) {
-    print("Error fetching branches: $e");
-    return [];
   }
-}
-
 
   Future<List<Treatment>> getTreatments() async {
-  try {
-    final response = await _dio.get("TreatmentList");
-    if (response.statusCode == 200 && response.data != null) {
-      return Treatment.fromJsonList(response.data);
-    } else {
+    try {
+      final response = await _dio.get("TreatmentList");
+      if (response.statusCode == 200 && response.data != null) {
+        return Treatment.fromJsonList(response.data);
+      } else {
+        return [];
+      }
+    } catch (e) {
+      print("Error fetching treatments: $e");
       return [];
     }
-  } catch (e) {
-    print("Error fetching treatments: $e");
-    return [];
   }
-}
-
 }

@@ -15,11 +15,15 @@ class PatientDetail {
 
   factory PatientDetail.fromJson(Map<String, dynamic> json) {
     return PatientDetail(
-      id: json['id'],
-      male: json['male'] ?? "",
-      female: json['female'] ?? "",
-      patientId: json['patient'],
-      treatment: json['treatment'],
+      id: json['id'] is String
+          ? int.tryParse(json['id']) ?? 0
+          : (json['id'] ?? 0),
+      male: json['male']?.toString() ?? "",
+      female: json['female']?.toString() ?? "",
+      patientId: json['patient'] is String
+          ? int.tryParse(json['patient']) ?? 0
+          : (json['patient'] ?? 0),
+      treatment: json['treatment']?.toString(),
     );
   }
 
@@ -75,12 +79,15 @@ class Patient {
 
   factory Patient.fromJson(Map<String, dynamic> json) {
     return Patient(
-      id: json['id'],
-      patientDetails: (json['patientdetails_set'] as List<dynamic>?)
+      id: json['id'] is String
+          ? int.tryParse(json['id']) ?? 0
+          : (json['id'] ?? 0),
+      patientDetails:
+          (json['patientdetails_set'] as List<dynamic>?)
               ?.map((e) => PatientDetail.fromJson(e))
               .toList() ??
           [],
-      branch: json['branch'],
+      branch: json['branch']?.toString(),
       user: json['user'] ?? "",
       payment: json['payment'] ?? "",
       name: json['name'] ?? "",
@@ -89,18 +96,18 @@ class Patient {
       price: json['price'] != null
           ? double.tryParse(json['price'].toString())
           : null,
-      totalAmount:
-          double.tryParse(json['total_amount'].toString()) ?? 0.0,
+      totalAmount: double.tryParse(json['total_amount'].toString()) ?? 0.0,
       discountAmount:
           double.tryParse(json['discount_amount'].toString()) ?? 0.0,
-      advanceAmount:
-          double.tryParse(json['advance_amount'].toString()) ?? 0.0,
-      balanceAmount:
-          double.tryParse(json['balance_amount'].toString()) ?? 0.0,
-      dateAndTime: json['date_nd_time'],
-      isActive: json['is_active'] ?? false,
-      createdAt: json['created_at'] ?? "",
-      updatedAt: json['updated_at'] ?? "",
+      advanceAmount: double.tryParse(json['advance_amount'].toString()) ?? 0.0,
+      balanceAmount: double.tryParse(json['balance_amount'].toString()) ?? 0.0,
+      dateAndTime: json['date_nd_time']?.toString(),
+      isActive: (json['is_active'] is bool)
+          ? json['is_active']
+          : (json['is_active']?.toString() == '1' ||
+                json['is_active']?.toString().toLowerCase() == 'true'),
+      createdAt: json['created_at']?.toString() ?? "",
+      updatedAt: json['updated_at']?.toString() ?? "",
     );
   }
 

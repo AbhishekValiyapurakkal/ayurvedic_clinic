@@ -28,7 +28,7 @@ class _SplashScreenState extends State<SplashScreen> {
     if (isLoggedIn) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => PatientsScreen()),
+        MaterialPageRoute(builder: (_) => LoginScreen()),
       );
     } else {
       Navigator.pushReplacement(

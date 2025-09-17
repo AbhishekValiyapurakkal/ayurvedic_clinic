@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthProvider with ChangeNotifier {
-  final ApiService _api = ApiService();
+  final ApiService apiService;
+
+  AuthProvider({required this.apiService});
 
   String? _token;
   bool _isLoading = false;
@@ -16,11 +18,12 @@ class AuthProvider with ChangeNotifier {
     _isLoading = true;
     notifyListeners();
 
-    final token = await _api.login(username, password);
+    final token = await apiService.login(username, password);
     _isLoading = false;
 
     if (token != null) {
       _token = token;
+      apiService.setToken(token);
       await _persistToken(token);
       notifyListeners();
       return true;
@@ -33,6 +36,7 @@ class AuthProvider with ChangeNotifier {
     final String? savedToken = prefs.getString('auth_token');
     if (savedToken != null && savedToken.isNotEmpty) {
       _token = savedToken;
+      apiService.setToken(savedToken);
       notifyListeners();
     }
   }
@@ -49,5 +53,5 @@ class AuthProvider with ChangeNotifier {
     await prefs.setString('auth_token', token);
   }
 
-  ApiService get api => _api;
+  ApiService get api => apiService;
 }
