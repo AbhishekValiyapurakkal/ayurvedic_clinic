@@ -1,4 +1,5 @@
 import 'package:ayurvedic_clinic_app/data/models/patient_model.dart';
+import 'package:ayurvedic_clinic_app/data/models/treatment_model.dart';
 import 'package:dio/dio.dart';
 
 class ApiService {
@@ -61,8 +62,18 @@ class ApiService {
     return response.data ?? [];
   }
 
-  Future<List<dynamic>> getTreatments() async {
+  Future<List<Treatment>> getTreatments() async {
+  try {
     final response = await _dio.get("TreatmentList");
-    return response.data ?? [];
+    if (response.statusCode == 200 && response.data != null) {
+      return Treatment.fromJsonList(response.data);
+    } else {
+      return [];
+    }
+  } catch (e) {
+    print("Error fetching treatments: $e");
+    return [];
   }
+}
+
 }
