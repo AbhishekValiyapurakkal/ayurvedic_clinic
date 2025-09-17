@@ -1,3 +1,4 @@
+import 'package:ayurvedic_clinic_app/data/models/branch_model.dart';
 import 'package:ayurvedic_clinic_app/data/models/patient_model.dart';
 import 'package:ayurvedic_clinic_app/data/models/treatment_model.dart';
 import 'package:dio/dio.dart';
@@ -57,10 +58,21 @@ class ApiService {
     return response.statusCode == 200;
   }
 
-  Future<List<dynamic>> getBranches() async {
+  Future<List<Branch>> getBranches() async {
+  try {
     final response = await _dio.get("BranchList");
-    return response.data ?? [];
+
+    if (response.statusCode == 200 && response.data != null) {
+      return Branch.fromJsonList(response.data);
+    } else {
+      return [];
+    }
+  } catch (e) {
+    print("Error fetching branches: $e");
+    return [];
   }
+}
+
 
   Future<List<Treatment>> getTreatments() async {
   try {
