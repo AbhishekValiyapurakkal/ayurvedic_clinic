@@ -30,6 +30,7 @@ class _RegisterSceenState extends State<RegisterSceen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<RegisterPatientProvider>().fetchTreatments();
+      context.read<BranchProvider>().fetchBranches();
     });
   }
 
@@ -633,36 +634,101 @@ class _RegisterSceenState extends State<RegisterSceen> {
                       Consumer<BranchProvider>(
                         builder: (context, branchProvider, child) {
                           if (branchProvider.isLoading) {
-                            return CircularProgressIndicator();
+                            return Container(
+                              width: screenWidth * (350 / 414),
+                              height: screenHeight * (50 / 896),
+                              padding: EdgeInsets.symmetric(horizontal: 24),
+                              decoration: BoxDecoration(
+                                border: Border.all(color: Color(0x40D9D9D9)),
+                                borderRadius: BorderRadius.circular(8.53),
+                              ),
+                              child: Center(
+                                child: SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
+                                ),
+                              ),
+                            );
                           } else if (branchProvider.error != null) {
-                            return Text('Error: ${branchProvider.error}');
+                            return Container(
+                              width: screenWidth * (350 / 414),
+                              height: screenHeight * (50 / 896),
+                              padding: EdgeInsets.symmetric(horizontal: 24),
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: Colors.red.withOpacity(0.5),
+                                ),
+                                borderRadius: BorderRadius.circular(8.53),
+                              ),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.error_outline,
+                                    color: Colors.red,
+                                    size: 20,
+                                  ),
+                                  SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      'Error loading branches',
+                                      style: TextStyle(
+                                        color: Colors.red,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ),
+                                  IconButton(
+                                    icon: Icon(Icons.refresh, size: 20),
+                                    onPressed: () =>
+                                        branchProvider.fetchBranches(),
+                                  ),
+                                ],
+                              ),
+                            );
+                          } else if (branchProvider.branches.isEmpty) {
+                            return Container(
+                              width: screenWidth * (350 / 414),
+                              height: screenHeight * (50 / 896),
+                              padding: EdgeInsets.symmetric(horizontal: 24),
+                              decoration: BoxDecoration(
+                                border: Border.all(color: Color(0x40D9D9D9)),
+                                borderRadius: BorderRadius.circular(8.53),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  'No branches available',
+                                  style: TextStyle(color: Colors.grey),
+                                ),
+                              ),
+                            );
                           } else {
                             return Container(
-                              width:
-                                  MediaQuery.of(context).size.width *
-                                  (350 / 414),
-                              height:
-                                  MediaQuery.of(context).size.height *
-                                  (50 / 896),
+                              width: screenWidth * (350 / 414),
+                              height: screenHeight * (50 / 896),
                               padding: EdgeInsets.symmetric(horizontal: 24),
                               decoration: BoxDecoration(
                                 border: Border.all(color: Color(0x40D9D9D9)),
                                 borderRadius: BorderRadius.circular(8.53),
                               ),
                               child: DropdownButton<Branch>(
-                                value:
-                                    selectedBranch, // must be null or in items
+                                value: selectedBranch,
                                 isExpanded: true,
                                 hint: Text(
                                   'Choose your branch',
-                                  style: TextStyle(fontSize: 15),
+                                  style: GoogleFonts.poppins(
+                                    fontWeight: FontWeight.w400,
+                                    fontSize: 15,
+                                  ),
                                 ),
                                 items: branchProvider.branches.map((branch) {
                                   return DropdownMenuItem<Branch>(
                                     value: branch,
                                     child: Text(
                                       branch.name,
-                                      style: TextStyle(
+                                      style: GoogleFonts.poppins(
                                         fontSize: 16,
                                         fontWeight: FontWeight.w500,
                                       ),
@@ -1180,9 +1246,7 @@ class _RegisterSceenState extends State<RegisterSceen> {
                                   male: selectedMaleCount.toString(),
                                   female: selectedFemaleCount.toString(),
                                   branch: selectedBranch?.name ?? "",
-                                  treatments:
-                                      selectedTreatmentId ??
-                                      "", // Use ID instead of name
+                                  treatments: selectedTreatmentId ?? "",
                                 );
 
                                 await provider.registerPatient(request);
