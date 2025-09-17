@@ -29,7 +29,8 @@ class MyApp extends StatelessWidget {
       ],
       child: MaterialApp(
         title: 'Ayurvedic Clinic App',
-        home: SplashScreen(),
+        debugShowCheckedModeBanner: false,
+        home: SplashScreen(apiService: apiService),
       ),
     );
   }
