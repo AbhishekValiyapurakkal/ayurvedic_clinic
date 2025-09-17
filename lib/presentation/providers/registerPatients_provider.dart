@@ -3,7 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 
 class RegisterPatientProvider with ChangeNotifier {
-  final Dio _dio = Dio();
+  final Dio _dio = Dio(
+  BaseOptions(baseUrl: "https://flutter-amr.noviindus.in/api/"),
+);
+
 
   bool _isLoading = false;
   bool get isLoading => _isLoading;
@@ -14,34 +17,28 @@ class RegisterPatientProvider with ChangeNotifier {
   bool _success = false;
   bool get success => _success;
 
-  Future<void> registerPatient(RegisterPatientRequest request, String token) async {
-    _isLoading = true;
-    _success = false;
-    _errorMessage = null;
-    notifyListeners();
+  Future<void> registerPatient(RegisterPatientRequest request) async {
+  _isLoading = true;
+  _success = false;
+  _errorMessage = null;
+  notifyListeners();
 
-    try {
-      final response = await _dio.post(
-        "https://your-base-url.com/PatientUpdate",
-        data: request.toJson(),
-        options: Options(
-          headers: {
-            "Authorization": "Bearer $token",
-            "Content-Type": "application/json",
-          },
-        ),
-      );
+  try {
+    final response = await _dio.post("PatientUpdate", data: request.toJson());
 
-      if (response.statusCode == 200) {
-        _success = true;
-      } else {
-        _errorMessage = "Failed with status: ${response.statusCode}";
-      }
-    } catch (e) {
-      _errorMessage = "Error: $e";
+
+    if (response.statusCode == 200 && response.data["status"] == true) {
+      _success = true;
+    } else {
+      _errorMessage = response.data["message"] ??
+          "Failed with status: ${response.statusCode}";
     }
-
-    _isLoading = false;
-    notifyListeners();
+  } catch (e) {
+    _errorMessage = "Error: $e";
   }
+
+  _isLoading = false;
+  notifyListeners();
+}
+
 }

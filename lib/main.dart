@@ -1,6 +1,7 @@
 import 'package:ayurvedic_clinic_app/api_services.dart';
 import 'package:ayurvedic_clinic_app/presentation/providers/branch_provider.dart';
 import 'package:ayurvedic_clinic_app/presentation/providers/patients_provider.dart';
+import 'package:ayurvedic_clinic_app/presentation/providers/registerPatients_provider.dart';
 import 'package:ayurvedic_clinic_app/presentation/providers/treatment_provider.dart';
 import 'package:ayurvedic_clinic_app/presentation/providers/auth_provider.dart';
 import 'package:ayurvedic_clinic_app/presentation/screens/splash_screen.dart';
@@ -30,6 +31,8 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(
           create: (_) => TreatmentProvider(apiService: apiService),
         ),
+        ChangeNotifierProvider(create: (_) => RegisterPatientProvider()),
+
       ],
       child: MaterialApp(
         title: 'Ayurvedic Clinic App',

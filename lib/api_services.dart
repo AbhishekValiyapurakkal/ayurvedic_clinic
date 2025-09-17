@@ -13,11 +13,9 @@ class ApiService {
 
   void setToken(String token) {
     _token = token;
-    // set default Authorization header for all future requests
     _dio.options.headers["Authorization"] = "Bearer $token";
   }
 
-  /// Optional helper if other code expects it
   Future<String?> getToken() async {
     return _token;
   }
@@ -69,6 +67,7 @@ class ApiService {
       final response = await _dio.post(
         "PatientUpdate",
         data: FormData.fromMap(request.toJson()),
+        options: Options(headers: {"Authorization": "Bearer $token"}),
       );
 
       if (response.statusCode == 200) {

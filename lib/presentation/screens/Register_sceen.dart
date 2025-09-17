@@ -1,3 +1,5 @@
+import 'package:ayurvedic_clinic_app/data/models/register_patients_model.dart';
+import 'package:ayurvedic_clinic_app/presentation/providers/registerPatients_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -968,7 +970,6 @@ class _RegisterSceenState extends State<RegisterSceen> {
 
                       Row(
                         children: [
-                          // Hour Dropdown
                           Expanded(
                             child: Container(
                               height: screenHeight * (50 / 896),
@@ -1072,9 +1073,67 @@ class _RegisterSceenState extends State<RegisterSceen> {
                                   borderRadius: BorderRadius.circular(8.52),
                                 ),
                               ),
-                              onPressed: () {
-                                
+                              onPressed: () async {
+                                final provider = context
+                                    .read<RegisterPatientProvider>();
+
+                                final request = RegisterPatientRequest(
+                                  name: _name.text.trim(),
+                                  excecutive: "",
+                                  payment: selectedPaymentOption ?? "Cash",
+                                  phone: _whatsappnumber.text.trim(),
+                                  address: _address.text.trim(),
+                                  totalAmount:
+                                      double.tryParse(
+                                        _totalamount.text,
+                                      ) ??
+                                      0,
+                                  discountAmount:
+                                      double.tryParse(
+                                        _discountamount.text,
+                                      ) ??
+                                      0,
+                                  advanceAmount:
+                                      double.tryParse(_advanceamount.text) ??
+                                      0,
+                                  balanceAmount:
+                                      double.tryParse(_balanceamount.text) ??
+                                      0,
+                                  dateAndTime: DateTime.now().toIso8601String(),
+                                  id: "", 
+                                  male: selectedMaleCount.toString(),
+                                  female: selectedFemaleCount.toString(),
+                                  branch: selectedValue2?? "",
+                                  treatments: selectedTreatmentValue ?? "",
+                                );
+
+                                await provider.registerPatient(
+                                  request,
+                                );
+
+                                if (provider.success) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        "Patient registered successfully!",
+                                      ),
+                                    ),
+                                  );
+                                  Navigator.pop(
+                                    context,
+                                  ); 
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        provider.errorMessage ??
+                                            "Something went wrong",
+                                      ),
+                                    ),
+                                  );
+                                }
                               },
+
                               child: Text(
                                 'Save',
                                 style: GoogleFonts.poppins(
