@@ -1,3 +1,4 @@
+import 'package:ayurvedic_clinic_app/presentation/providers/registerPatients_provider.dart';
 import 'package:ayurvedic_clinic_app/presentation/screens/patients_screen.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -30,6 +31,7 @@ class _LoginScreenState extends State<LoginScreen> {
     double screenHeight = screenSize.height;
 
     final auth = context.watch<AuthProvider>();
+    final registerProvider = context.read<RegisterPatientProvider>();
 
     return Scaffold(
       body: SingleChildScrollView(
@@ -192,14 +194,22 @@ class _LoginScreenState extends State<LoginScreen> {
                                       );
                                       return;
                                     }
+
                                     final success = await context
                                         .read<AuthProvider>()
                                         .login(email, password);
+
                                     if (success) {
                                       final token = context
                                           .read<AuthProvider>()
                                           .token;
                                       print('Token: $token');
+
+                                      // ✅ CRITICAL: Set the token in RegisterPatientProvider
+                                      final registerProvider = context
+                                          .read<RegisterPatientProvider>();
+                                      registerProvider.setToken(token!);
+
                                       Navigator.pushReplacement(
                                         context,
                                         MaterialPageRoute(
@@ -207,6 +217,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                               PatientsScreen(),
                                         ),
                                       );
+
                                       ScaffoldMessenger.of(
                                         context,
                                       ).showSnackBar(
@@ -222,6 +233,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       );
                                     }
                                   },
+
                             child: Text(
                               'Login',
                               style: GoogleFonts.poppins(

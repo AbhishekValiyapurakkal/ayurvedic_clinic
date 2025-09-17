@@ -5,6 +5,7 @@ import 'package:ayurvedic_clinic_app/presentation/providers/registerPatients_pro
 import 'package:ayurvedic_clinic_app/presentation/providers/treatment_provider.dart';
 import 'package:ayurvedic_clinic_app/presentation/providers/auth_provider.dart';
 import 'package:ayurvedic_clinic_app/presentation/screens/splash_screen.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -31,8 +32,13 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(
           create: (_) => TreatmentProvider(apiService: apiService),
         ),
-        ChangeNotifierProvider(create: (_) => RegisterPatientProvider()),
-
+        ChangeNotifierProvider(
+      create: (context) => RegisterPatientProvider(
+        dio: Dio(BaseOptions(
+          baseUrl: "https://flutter-amr.noviindus.in/api/",
+        )),
+      ),
+    ),
       ],
       child: MaterialApp(
         title: 'Ayurvedic Clinic App',

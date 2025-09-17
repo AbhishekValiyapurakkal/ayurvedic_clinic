@@ -1,4 +1,5 @@
 import 'package:ayurvedic_clinic_app/data/models/register_patients_model.dart';
+import 'package:ayurvedic_clinic_app/data/models/treatment_model.dart';
 import 'package:ayurvedic_clinic_app/presentation/providers/registerPatients_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -22,6 +23,14 @@ class _RegisterSceenState extends State<RegisterSceen> {
   final TextEditingController _balanceamount = TextEditingController();
   final TextEditingController _treatmentdate = TextEditingController();
 
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<RegisterPatientProvider>().fetchTreatments();
+    });
+  }
+
   String? selectedPaymentOption;
 
   String? selectedHour;
@@ -40,22 +49,37 @@ class _RegisterSceenState extends State<RegisterSceen> {
   String? selectedValue2;
 
   String? selectedTreatmentValue;
+  String? selectedTreatmentId;
   int selectedMaleCount = 0;
   int selectedFemaleCount = 0;
 
   final List<String> location = ["banglore", "kochi", "chennai", "malappuram"];
   final List<String> branch = ["banglore", "kochi", "chennai", "malappuram"];
 
-  void _showTreatmentDialog() {
+  void _showTreatmentDialog() async {
+    final registerProvider = context.read<RegisterPatientProvider>();
+
+    // Show loading dialog first
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Center(child: CircularProgressIndicator()),
+    );
+
+    // Fetch treatments
+    await registerProvider.fetchTreatments();
+
+    // Close the loading dialog
+    Navigator.of(context).pop();
+
+    // Now show the actual treatment dialog
     final Size screenSize = MediaQuery.of(context).size;
     double screenWidth = screenSize.width;
     double screenHeight = screenSize.height;
-    String? selectedTreatment;
+    Treatment? selectedTreatment;
 
     int maleCounter = 0;
     int femaleCounter = 0;
-
-    final List<String> treatments = ["1", "2", "3", "4"];
 
     showDialog(
       context: context,
@@ -64,277 +88,313 @@ class _RegisterSceenState extends State<RegisterSceen> {
           builder: (context, setState) {
             return AlertDialog(
               title: Text(
-                'choose treatment',
+                'Choose Treatment',
                 style: GoogleFonts.poppins(
                   fontWeight: FontWeight.w400,
                   fontSize: 16,
                 ),
               ),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    width: double.infinity,
-                    height: 50,
-                    padding: EdgeInsets.symmetric(horizontal: 12),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Color.fromARGB(64, 28, 26, 26)),
-                      borderRadius: BorderRadius.circular(8.53),
-                    ),
-                    child: DropdownButton<String>(
-                      value: selectedTreatment,
-                      isExpanded: true,
-                      hint: Text(
-                        'Choose treatment',
-                        style: GoogleFonts.poppins(
-                          fontWeight: FontWeight.w400,
-                          fontSize: 14,
+              content: registerProvider.treatmentError != null
+                  ? Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'Error: ${registerProvider.treatmentError}',
+                          style: TextStyle(color: Colors.red),
+                          textAlign: TextAlign.center,
                         ),
-                      ),
-                      items: treatments.map((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(
-                            value,
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
+                        SizedBox(height: 10),
+                        ElevatedButton(
+                          onPressed: () async {
+                            // Show loading
+                            showDialog(
+                              context: context,
+                              barrierDismissible: false,
+                              builder: (context) =>
+                                  Center(child: CircularProgressIndicator()),
+                            );
+                            await registerProvider.fetchTreatments();
+                            Navigator.of(context).pop();
+                          },
+                          child: Text('Retry'),
+                        ),
+                      ],
+                    )
+                  : Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          width: double.infinity,
+                          height: 50,
+                          padding: EdgeInsets.symmetric(horizontal: 12),
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: Color.fromARGB(64, 28, 26, 26),
+                            ),
+                            borderRadius: BorderRadius.circular(8.53),
+                          ),
+                          child: DropdownButton<Treatment>(
+                            value: selectedTreatment,
+                            isExpanded: true,
+                            hint: Text(
+                              'Choose treatment',
+                              style: GoogleFonts.poppins(
+                                fontWeight: FontWeight.w400,
+                                fontSize: 14,
+                              ),
+                            ),
+                            items: registerProvider.treatments.map((
+                              Treatment treatment,
+                            ) {
+                              return DropdownMenuItem<Treatment>(
+                                value: treatment,
+                                child: Text(
+                                  '${treatment.name} - ₹${treatment.price}',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              );
+                            }).toList(),
+                            onChanged: (Treatment? newValue) {
+                              setState(() {
+                                selectedTreatment = newValue;
+                              });
+                            },
+                            underline: Container(),
+                            icon: Icon(
+                              Icons.keyboard_arrow_down,
+                              color: Colors.black,
                             ),
                           ),
-                        );
-                      }).toList(),
-                      onChanged: (String? newValue) {
-                        setState(() {
-                          selectedTreatment = newValue;
-                        });
-                      },
-                      underline: Container(),
-                      icon: Icon(
-                        Icons.keyboard_arrow_down,
-                        color: Colors.black,
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 20),
-                  Text(
-                    'Add patient',
-                    style: GoogleFonts.poppins(
-                      fontWeight: FontWeight.w400,
-                      fontSize: 16,
-                    ),
-                  ),
-                  SizedBox(height: 20),
+                        ),
+                        SizedBox(height: 20),
+                        Text(
+                          'Add patient',
+                          style: GoogleFonts.poppins(
+                            fontWeight: FontWeight.w400,
+                            fontSize: 16,
+                          ),
+                        ),
+                        SizedBox(height: 20),
 
-                  Row(
-                    children: [
-                      Container(
-                        height: screenHeight * (50 / 896),
-                        width: screenWidth * (124 / 414),
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            color: Color.fromARGB(
-                              255,
-                              61,
-                              60,
-                              60,
-                            ).withOpacity(0.25),
-                          ),
-                          borderRadius: BorderRadius.circular(8.53),
-                        ),
-                        child: Center(
-                          child: Text(
-                            'Male',
-                            style: GoogleFonts.poppins(
-                              fontWeight: FontWeight.w400,
-                              fontSize: 16,
-                            ),
-                          ),
-                        ),
-                      ),
-                      Spacer(),
-                      Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Color(0x40D9D9D9)),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
+                        Row(
                           children: [
-                            IconButton(
-                              onPressed: () {
-                                setState(() {
-                                  if (maleCounter > 0) {
-                                    maleCounter--;
-                                  }
-                                });
-                              },
-                              icon: Icon(
-                                Icons.remove_circle,
-                                color: Colors.green,
-                              ),
-                              constraints: BoxConstraints(
-                                minWidth: 40,
-                                minHeight: 40,
-                              ),
-                            ),
                             Container(
-                              height: screenHeight * (44 / 896),
-                              padding: EdgeInsets.symmetric(horizontal: 16),
+                              height: screenHeight * (50 / 896),
+                              width: screenWidth * (124 / 414),
                               decoration: BoxDecoration(
                                 border: Border.all(
-                                  color: Color.fromARGB(64, 28, 26, 26),
+                                  color: Color.fromARGB(
+                                    255,
+                                    61,
+                                    60,
+                                    60,
+                                  ).withOpacity(0.25),
                                 ),
                                 borderRadius: BorderRadius.circular(8.53),
                               ),
                               child: Center(
                                 child: Text(
-                                  maleCounter.toString(),
+                                  'Male',
                                   style: GoogleFonts.poppins(
-                                    fontWeight: FontWeight.w600,
+                                    fontWeight: FontWeight.w400,
                                     fontSize: 16,
                                   ),
                                 ),
                               ),
                             ),
-                            IconButton(
-                              onPressed: () {
-                                setState(() {
-                                  maleCounter++;
-                                });
-                              },
-                              icon: Icon(
-                                Icons.add_circle_rounded,
-                                color: Colors.green,
+                            Spacer(),
+                            Container(
+                              decoration: BoxDecoration(
+                                border: Border.all(color: Color(0x40D9D9D9)),
+                                borderRadius: BorderRadius.circular(8),
                               ),
-                              constraints: BoxConstraints(
-                                minWidth: 40,
-                                minHeight: 40,
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  IconButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        if (maleCounter > 0) {
+                                          maleCounter--;
+                                        }
+                                      });
+                                    },
+                                    icon: Icon(
+                                      Icons.remove_circle,
+                                      color: Colors.green,
+                                    ),
+                                    constraints: BoxConstraints(
+                                      minWidth: 40,
+                                      minHeight: 40,
+                                    ),
+                                  ),
+                                  Container(
+                                    height: screenHeight * (44 / 896),
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 16,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      border: Border.all(
+                                        color: Color.fromARGB(64, 28, 26, 26),
+                                      ),
+                                      borderRadius: BorderRadius.circular(8.53),
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        maleCounter.toString(),
+                                        style: GoogleFonts.poppins(
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  IconButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        maleCounter++;
+                                      });
+                                    },
+                                    icon: Icon(
+                                      Icons.add_circle_rounded,
+                                      color: Colors.green,
+                                    ),
+                                    constraints: BoxConstraints(
+                                      minWidth: 40,
+                                      minHeight: 40,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ],
                         ),
-                      ),
-                    ],
-                  ),
 
-                  Row(
-                    children: [
-                      Container(
-                        height: screenHeight * (50 / 896),
-                        width: screenWidth * (124 / 414),
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            color: Color.fromARGB(
-                              255,
-                              61,
-                              60,
-                              60,
-                            ).withOpacity(0.25),
-                          ),
-                          borderRadius: BorderRadius.circular(8.53),
-                        ),
-                        child: Center(
-                          child: Text(
-                            'Female',
-                            style: GoogleFonts.poppins(
-                              fontWeight: FontWeight.w400,
-                              fontSize: 16,
-                            ),
-                          ),
-                        ),
-                      ),
-                      Spacer(),
-                      Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Color(0x40D9D9D9)),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
+                        Row(
                           children: [
-                            IconButton(
-                              onPressed: () {
-                                setState(() {
-                                  if (femaleCounter > 0) {
-                                    femaleCounter--;
-                                  }
-                                });
-                              },
-                              icon: Icon(
-                                Icons.remove_circle,
-                                color: Colors.green,
-                              ),
-                              constraints: BoxConstraints(
-                                minWidth: 40,
-                                minHeight: 40,
-                              ),
-                            ),
                             Container(
-                              height: screenHeight * (44 / 896),
-                              padding: EdgeInsets.symmetric(horizontal: 16),
+                              height: screenHeight * (50 / 896),
+                              width: screenWidth * (124 / 414),
                               decoration: BoxDecoration(
                                 border: Border.all(
-                                  color: Color.fromARGB(64, 28, 26, 26),
+                                  color: Color.fromARGB(
+                                    255,
+                                    61,
+                                    60,
+                                    60,
+                                  ).withOpacity(0.25),
                                 ),
                                 borderRadius: BorderRadius.circular(8.53),
                               ),
                               child: Center(
                                 child: Text(
-                                  femaleCounter.toString(),
+                                  'Female',
                                   style: GoogleFonts.poppins(
-                                    fontWeight: FontWeight.w600,
+                                    fontWeight: FontWeight.w400,
                                     fontSize: 16,
                                   ),
                                 ),
                               ),
                             ),
-                            IconButton(
-                              onPressed: () {
-                                setState(() {
-                                  femaleCounter++;
-                                });
-                              },
-                              icon: Icon(
-                                Icons.add_circle_rounded,
-                                color: Colors.green,
+                            Spacer(),
+                            Container(
+                              decoration: BoxDecoration(
+                                border: Border.all(color: Color(0x40D9D9D9)),
+                                borderRadius: BorderRadius.circular(8),
                               ),
-                              constraints: BoxConstraints(
-                                minWidth: 40,
-                                minHeight: 40,
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  IconButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        if (femaleCounter > 0) {
+                                          femaleCounter--;
+                                        }
+                                      });
+                                    },
+                                    icon: Icon(
+                                      Icons.remove_circle,
+                                      color: Colors.green,
+                                    ),
+                                    constraints: BoxConstraints(
+                                      minWidth: 40,
+                                      minHeight: 40,
+                                    ),
+                                  ),
+                                  Container(
+                                    height: screenHeight * (44 / 896),
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 16,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      border: Border.all(
+                                        color: Color.fromARGB(64, 28, 26, 26),
+                                      ),
+                                      borderRadius: BorderRadius.circular(8.53),
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        femaleCounter.toString(),
+                                        style: GoogleFonts.poppins(
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  IconButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        femaleCounter++;
+                                      });
+                                    },
+                                    icon: Icon(
+                                      Icons.add_circle_rounded,
+                                      color: Colors.green,
+                                    ),
+                                    constraints: BoxConstraints(
+                                      minWidth: 40,
+                                      minHeight: 40,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ],
                         ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+                      ],
+                    ),
               actions: [
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFF389A48),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                if (registerProvider.treatmentError == null)
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color(0xFF389A48),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    onPressed: () {
+                      Navigator.of(context).pop({
+                        "treatment": selectedTreatment?.name,
+                        "treatment_id": selectedTreatment?.id.toString(),
+                        "male": maleCounter,
+                        "female": femaleCounter,
+                      });
+                    },
+                    child: Text(
+                      'Save',
+                      style: GoogleFonts.poppins(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
-                  onPressed: () {
-                    Navigator.of(context).pop({
-                      "treatment": selectedTreatment,
-                      "male": maleCounter,
-                      "female": femaleCounter,
-                    });
-                  },
-                  child: Text(
-                    'save',
-                    style: GoogleFonts.poppins(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 14,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
               ],
             );
           },
@@ -344,6 +404,7 @@ class _RegisterSceenState extends State<RegisterSceen> {
       if (result != null) {
         setState(() {
           selectedTreatmentValue = result["treatment"];
+          selectedTreatmentId = result["treatment_id"];
           selectedMaleCount = result["male"];
           selectedFemaleCount = result["female"];
         });
@@ -618,6 +679,7 @@ class _RegisterSceenState extends State<RegisterSceen> {
                         ),
                       ),
                       SizedBox(height: 6),
+
                       Container(
                         width: screenWidth * (350 / 414),
                         padding: EdgeInsets.all(12),
@@ -728,26 +790,32 @@ class _RegisterSceenState extends State<RegisterSceen> {
                       ),
 
                       SizedBox(height: 8),
-                      SizedBox(
-                        width: screenWidth * (350 / 414),
-                        height: 50,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Color(0x4D389A48),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8.52),
+                      Consumer<RegisterPatientProvider>(
+                        builder: (context, registerProvider, child) {
+                          return SizedBox(
+                            width: screenWidth * (350 / 414),
+                            height: 50,
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Color(0x4D389A48),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8.52),
+                                ),
+                              ),
+                              onPressed: () {
+                                _showTreatmentDialog();
+                              },
+                              child: Text(
+                                '+ Add Treatments',
+                                style: GoogleFonts.poppins(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 16,
+                                  color: Colors.white,
+                                ),
+                              ),
                             ),
-                          ),
-                          onPressed: _showTreatmentDialog,
-                          child: Text(
-                            '+ Add Treatments',
-                            style: GoogleFonts.poppins(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 16,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
+                          );
+                        },
                       ),
                       SizedBox(height: 20),
                       Text(
@@ -1084,32 +1152,25 @@ class _RegisterSceenState extends State<RegisterSceen> {
                                   phone: _whatsappnumber.text.trim(),
                                   address: _address.text.trim(),
                                   totalAmount:
-                                      double.tryParse(
-                                        _totalamount.text,
-                                      ) ??
-                                      0,
+                                      double.tryParse(_totalamount.text) ?? 0,
                                   discountAmount:
-                                      double.tryParse(
-                                        _discountamount.text,
-                                      ) ??
+                                      double.tryParse(_discountamount.text) ??
                                       0,
                                   advanceAmount:
-                                      double.tryParse(_advanceamount.text) ??
-                                      0,
+                                      double.tryParse(_advanceamount.text) ?? 0,
                                   balanceAmount:
-                                      double.tryParse(_balanceamount.text) ??
-                                      0,
+                                      double.tryParse(_balanceamount.text) ?? 0,
                                   dateAndTime: DateTime.now().toIso8601String(),
-                                  id: "", 
+                                  id: "",
                                   male: selectedMaleCount.toString(),
                                   female: selectedFemaleCount.toString(),
-                                  branch: selectedValue2?? "",
-                                  treatments: selectedTreatmentValue ?? "",
+                                  branch: selectedValue2 ?? "",
+                                  treatments:
+                                      selectedTreatmentId ??
+                                      "", // Use ID instead of name
                                 );
 
-                                await provider.registerPatient(
-                                  request,
-                                );
+                                await provider.registerPatient(request);
 
                                 if (provider.success) {
                                   ScaffoldMessenger.of(context).showSnackBar(
@@ -1119,9 +1180,7 @@ class _RegisterSceenState extends State<RegisterSceen> {
                                       ),
                                     ),
                                   );
-                                  Navigator.pop(
-                                    context,
-                                  ); 
+                                  Navigator.pop(context);
                                 } else {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(

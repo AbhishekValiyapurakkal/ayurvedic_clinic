@@ -94,27 +94,60 @@ class ApiService {
       final response = await _dio.get("BranchList");
 
       if (response.statusCode == 200 && response.data != null) {
-        return Branch.fromJsonList(response.data);
+        final Map<String, dynamic> responseData = response.data;
+
+        if (responseData['status'] == true) {
+          final List<dynamic> branchesData = responseData['branches'] ?? [];
+          return Branch.fromJsonList(branchesData);
+        } else {
+          throw Exception(
+            'API returned false status: ${responseData['message']}',
+          );
+        }
       } else {
-        return [];
+        throw Exception('Failed to load branches: ${response.statusCode}');
+      }
+    } on DioException catch (e) {
+      print("Error fetching branches: $e");
+      if (e.response != null) {
+        throw Exception('Server error: ${e.response?.statusCode}');
+      } else {
+        throw Exception('Network error: ${e.message}');
       }
     } catch (e) {
-      print("Error fetching branches: $e");
-      return [];
+      print("Unexpected error fetching branches: $e");
+      throw Exception('Unexpected error: $e');
     }
   }
 
   Future<List<Treatment>> getTreatments() async {
-    try {
-      final response = await _dio.get("TreatmentList");
-      if (response.statusCode == 200 && response.data != null) {
-        return Treatment.fromJsonList(response.data);
+  try {
+    final response = await _dio.get("TreatmentList");
+
+    if (response.statusCode == 200 && response.data != null) {
+      final Map<String, dynamic> responseData = response.data;
+      
+      // Use TreatmentResponse to parse the structured response
+      final treatmentResponse = TreatmentResponse.fromJson(responseData);
+      
+      if (treatmentResponse.status) {
+        return treatmentResponse.treatments;
       } else {
-        return [];
+        throw Exception('API returned false status: ${treatmentResponse.message}');
       }
-    } catch (e) {
-      print("Error fetching treatments: $e");
-      return [];
+    } else {
+      throw Exception('Failed to load treatments: ${response.statusCode}');
     }
+  } on DioException catch (e) {
+    print("Error fetching treatments: $e");
+    if (e.response != null) {
+      throw Exception('Server error: ${e.response?.statusCode} - ${e.response?.data}');
+    } else {
+      throw Exception('Network error: ${e.message}');
+    }
+  } catch (e) {
+    print("Unexpected error fetching treatments: $e");
+    throw Exception('Unexpected error: $e');
   }
+}
 }
