@@ -734,6 +734,8 @@ class _RegisterSceenState extends State<RegisterSceen> {
                                       ),
                                     ),
                                   );
+
+                                  
                                 }).toList(),
                                 onChanged: (Branch? newBranch) {
                                   setState(() {
