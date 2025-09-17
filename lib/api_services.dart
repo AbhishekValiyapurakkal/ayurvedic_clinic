@@ -13,7 +13,13 @@ class ApiService {
 
   void setToken(String token) {
     _token = token;
+    // set default Authorization header for all future requests
     _dio.options.headers["Authorization"] = "Bearer $token";
+  }
+
+  /// Optional helper if other code expects it
+  Future<String?> getToken() async {
+    return _token;
   }
 
   Future<String?> login(String username, String password) async {
@@ -25,8 +31,10 @@ class ApiService {
 
       if (response.statusCode == 200) {
         final token = response.data["token"];
-        setToken(token);
-        return token;
+        if (token != null) {
+          setToken(token);
+          return token;
+        }
       }
     } catch (e) {
       print("Login error: $e");
@@ -52,6 +60,12 @@ class ApiService {
 
   Future<bool> registerPatient(RegisterPatientRequest request) async {
     try {
+      final token = _token;
+      if (token == null) {
+        print("Register patient error: no token found. Please login first.");
+        return false;
+      }
+
       final response = await _dio.post(
         "PatientUpdate",
         data: FormData.fromMap(request.toJson()),

@@ -41,8 +41,8 @@ class _RegisterSceenState extends State<RegisterSceen> {
   int selectedMaleCount = 0;
   int selectedFemaleCount = 0;
 
-  final List<String> location = ["This Week", "This Month", "This Year"];
-  final List<String> branch = ["This Week", "This Month", "This Year"];
+  final List<String> location = ["banglore", "kochi", "chennai", "malappuram"];
+  final List<String> branch = ["banglore", "kochi", "chennai", "malappuram"];
 
   void _showTreatmentDialog() {
     final Size screenSize = MediaQuery.of(context).size;
@@ -1072,7 +1072,9 @@ class _RegisterSceenState extends State<RegisterSceen> {
                                   borderRadius: BorderRadius.circular(8.52),
                                 ),
                               ),
-                              onPressed: () {},
+                              onPressed: () {
+                                
+                              },
                               child: Text(
                                 'Save',
                                 style: GoogleFonts.poppins(

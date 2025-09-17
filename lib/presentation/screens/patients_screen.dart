@@ -172,6 +172,7 @@ class _PatientsScreenState extends State<PatientsScreen> {
                   ),
                 ),
                 SizedBox(height: screenHeight * (14 / 896)),
+
                 Expanded(
                   child: Container(
                     width: screenWidth * (350 / 414),
@@ -181,54 +182,63 @@ class _PatientsScreenState extends State<PatientsScreen> {
                         final provider = context.watch<PatientProvider>();
                         final isLoading = provider.isLoading;
                         final patients = provider.patients;
-                        if (isLoading) {
+
+                        if (isLoading && patients.isEmpty) {
                           return Center(child: CircularProgressIndicator());
                         }
-                        return ListView.builder(
-                          padding: EdgeInsets.only(bottom: 90),
-                          itemCount: patients.length,
-                          itemBuilder: (context, index) {
-                            final p = patients[index];
-                            return Padding(
-                              padding: EdgeInsets.only(
-                                bottom: index == patients.length - 1 ? 0 : 24,
-                              ),
-                              child: Container(
-                                width: screenWidth * (350 / 414),
-                                height: screenHeight * (166 / 896),
-                                decoration: BoxDecoration(
-                                  color: Color(0xFFF1F1F1),
-                                  borderRadius: BorderRadius.circular(10),
+
+                        return RefreshIndicator(
+                          onRefresh: () async {
+                            await context
+                                .read<PatientProvider>()
+                                .fetchPatients();
+                          },
+                          child: ListView.builder(
+                            physics:
+                                const AlwaysScrollableScrollPhysics(), // ensures refresh works even if list is short
+                            padding: const EdgeInsets.only(bottom: 90),
+                            itemCount: patients.length,
+                            itemBuilder: (context, index) {
+                              final p = patients[index];
+                              return Padding(
+                                padding: EdgeInsets.only(
+                                  bottom: index == patients.length - 1 ? 0 : 24,
                                 ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                        left: 20,
-                                        top: 23,
-                                      ),
-                                      child: Container(
-                                        height: screenHeight * (29 / 896),
-                                        width: screenWidth * (300 / 414),
-                                        color: Colors.transparent,
-                                        child: Text(
-                                          '${index + 1}.  ${p.name}',
-                                          overflow: TextOverflow.ellipsis,
-                                          style: GoogleFonts.poppins(
-                                            fontWeight: FontWeight.w500,
-                                            fontSize: 18,
+                                child: Container(
+                                  width: screenWidth * (350 / 414),
+                                  height: screenHeight * (166 / 896),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFF1F1F1),
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.only(
+                                          left: 20,
+                                          top: 23,
+                                        ),
+                                        child: Container(
+                                          height: screenHeight * (29 / 896),
+                                          width: screenWidth * (300 / 414),
+                                          color: Colors.transparent,
+                                          child: Text(
+                                            '${index + 1}.  ${p.name}',
+                                            overflow: TextOverflow.ellipsis,
+                                            style: GoogleFonts.poppins(
+                                              fontWeight: FontWeight.w500,
+                                              fontSize: 18,
+                                            ),
                                           ),
                                         ),
                                       ),
-                                    ),
-                                    SizedBox(height: 3),
-                                    Padding(
-                                      padding: const EdgeInsets.only(left: 45),
-                                      child: Container(
-                                        height: screenHeight * (24 / 896),
-                                        width: screenWidth * (300 / 414),
-                                        color: Colors.transparent,
+                                      const SizedBox(height: 3),
+                                      Padding(
+                                        padding: const EdgeInsets.only(
+                                          left: 45,
+                                        ),
                                         child: Text(
                                           p.branch?.toString() ?? '',
                                           maxLines: 1,
@@ -240,53 +250,48 @@ class _PatientsScreenState extends State<PatientsScreen> {
                                           ),
                                         ),
                                       ),
-                                    ),
-                                    SizedBox(height: 3),
-                                    Padding(
-                                      padding: const EdgeInsets.only(left: 45),
-                                      child: Container(
-                                        height: screenHeight * (24 / 896),
-                                        width: screenWidth * (300 / 414),
-                                        color: Colors.transparent,
+                                      const SizedBox(height: 3),
+                                      Padding(
+                                        padding: const EdgeInsets.only(
+                                          left: 45,
+                                        ),
                                         child: Row(
                                           mainAxisAlignment:
-                                              MainAxisAlignment.spaceEvenly,
+                                              MainAxisAlignment.start,
                                           children: [
-                                            Icon(
+                                            const Icon(
                                               Icons.calendar_month,
                                               size: 13,
                                               color: Color(0xFFF24E1E),
                                             ),
+                                            const SizedBox(width: 4),
                                             Text(
                                               (p.dateAndTime ?? '').toString(),
                                             ),
-                                            Icon(
+                                            const SizedBox(width: 12),
+                                            const Icon(
                                               Icons.people,
                                               size: 13,
                                               color: Color(0xFFF24E1E),
                                             ),
+                                            const SizedBox(width: 4),
                                             Text(p.user.toString()),
                                           ],
                                         ),
                                       ),
-                                    ),
-                                    SizedBox(height: 10),
-                                    Divider(
-                                      height: 1,
-                                      thickness: 1,
-                                      color: Color(0xFFCCCCCC),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                        left: 45,
-                                        top: 9,
+                                      const SizedBox(height: 10),
+                                      const Divider(
+                                        height: 1,
+                                        thickness: 1,
+                                        color: Color(0xFFCCCCCC),
                                       ),
-                                      child: GestureDetector(
-                                        onTap: () {},
-                                        child: Container(
-                                          height: screenHeight * (23 / 896),
-                                          width: screenWidth * (277 / 414),
-                                          color: Colors.transparent,
+                                      Padding(
+                                        padding: const EdgeInsets.only(
+                                          left: 45,
+                                          top: 9,
+                                        ),
+                                        child: GestureDetector(
+                                          onTap: () {},
                                           child: Row(
                                             mainAxisAlignment:
                                                 MainAxisAlignment.spaceBetween,
@@ -295,10 +300,10 @@ class _PatientsScreenState extends State<PatientsScreen> {
                                                 'View Booking details',
                                                 style: GoogleFonts.poppins(
                                                   fontWeight: FontWeight.w300,
-                                                  fontSize: 16,
+                                                  fontSize: 15,
                                                 ),
                                               ),
-                                              Icon(
+                                              const Icon(
                                                 Icons.arrow_forward_ios_rounded,
                                                 size: 12,
                                               ),
@@ -306,12 +311,12 @@ class _PatientsScreenState extends State<PatientsScreen> {
                                           ),
                                         ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
-                              ),
-                            );
-                          },
+                              );
+                            },
+                          ),
                         );
                       },
                     ),
