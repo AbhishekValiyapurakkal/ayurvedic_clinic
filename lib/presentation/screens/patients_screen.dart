@@ -1,3 +1,4 @@
+import 'package:ayurvedic_clinic_app/presentation/screens/Register_sceen.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -175,465 +176,144 @@ class _PatientsScreenState extends State<PatientsScreen> {
                   child: Container(
                     width: screenWidth * (350 / 414),
                     color: Colors.transparent,
-                    child: ListView(
-                      padding: EdgeInsets.only(bottom: 90),
-                      children: [
-                        Container(
-                          width: screenWidth * (350 / 414),
-                          height: screenHeight * (166 / 896),
-                          decoration: BoxDecoration(
-                            color: Color(0xFFF1F1F1),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.only(
-                                  left: 20,
-                                  top: 23,
-                                ),
-                                child: Container(
-                                  height: screenHeight * (29 / 896),
-                                  width: screenWidth * (146 / 414),
-                                  color: Colors.transparent,
-                                  child: Text(
-                                    '1.  Vikram Singh',
-                                    style: GoogleFonts.poppins(
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 18,
-                                    ),
-                                  ),
-                                ),
+                    child: Builder(
+                      builder: (context) {
+                        final provider = context.watch<PatientProvider>();
+                        final isLoading = provider.isLoading;
+                        final patients = provider.patients;
+                        if (isLoading) {
+                          return Center(child: CircularProgressIndicator());
+                        }
+                        return ListView.builder(
+                          padding: EdgeInsets.only(bottom: 90),
+                          itemCount: patients.length,
+                          itemBuilder: (context, index) {
+                            final p = patients[index];
+                            return Padding(
+                              padding: EdgeInsets.only(
+                                bottom: index == patients.length - 1 ? 0 : 24,
                               ),
-                              SizedBox(height: 3),
-                              Padding(
-                                padding: const EdgeInsets.only(left: 45),
-                                child: Container(
-                                  height: screenHeight * (24 / 896),
-                                  width: screenWidth * (277 / 414),
-                                  color: Colors.transparent,
-                                  child: Text(
-                                    'Couple Combo Package (Rejuven...',
-                                    style: GoogleFonts.poppins(
-                                      fontWeight: FontWeight.w300,
-                                      fontSize: 14,
-                                      color: Colors.green,
-                                    ),
-                                  ),
+                              child: Container(
+                                width: screenWidth * (350 / 414),
+                                height: screenHeight * (166 / 896),
+                                decoration: BoxDecoration(
+                                  color: Color(0xFFF1F1F1),
+                                  borderRadius: BorderRadius.circular(10),
                                 ),
-                              ),
-                              SizedBox(height: 3),
-                              Padding(
-                                padding: const EdgeInsets.only(left: 45),
-                                child: Container(
-                                  height: screenHeight * (24 / 896),
-                                  width: screenWidth * (222 / 414),
-                                  color: Colors.transparent,
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
-                                    children: [
-                                      Icon(
-                                        Icons.calendar_month,
-                                        size: 13,
-                                        color: Color(0xFFF24E1E),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                        left: 20,
+                                        top: 23,
                                       ),
-                                      Text('31/01/2024'),
-
-                                      Icon(
-                                        Icons.people,
-                                        size: 13,
-                                        color: Color(0xFFF24E1E),
-                                      ),
-                                      Text('jitheesh'),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              SizedBox(height: 10),
-                              Divider(
-                                height: 1,
-                                thickness: 1,
-                                color: Color(0xFFCCCCCC),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(
-                                  left: 45,
-                                  top: 9,
-                                ),
-                                child: GestureDetector(
-                                  onTap: () {},
-                                  child: Container(
-                                    height: screenHeight * (23 / 896),
-                                    width: screenWidth * (277 / 414),
-                                    color: Colors.transparent,
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          'View Booking details',
+                                      child: Container(
+                                        height: screenHeight * (29 / 896),
+                                        width: screenWidth * (300 / 414),
+                                        color: Colors.transparent,
+                                        child: Text(
+                                          '${index + 1}.  ${p.name}',
+                                          overflow: TextOverflow.ellipsis,
                                           style: GoogleFonts.poppins(
-                                            fontWeight: FontWeight.w300,
-                                            fontSize: 16,
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: 18,
                                           ),
                                         ),
-                                        Icon(
-                                          Icons.arrow_forward_ios_rounded,
-                                          size: 12,
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(height: 24),
-                        Container(
-                          width: screenWidth * (350 / 414),
-                          height: screenHeight * (166 / 896),
-                          decoration: BoxDecoration(
-                            color: Color(0xFFF1F1F1),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.only(
-                                  left: 20,
-                                  top: 23,
-                                ),
-                                child: Container(
-                                  height: screenHeight * (29 / 896),
-                                  width: screenWidth * (146 / 414),
-                                  color: Colors.transparent,
-                                  child: Text(
-                                    '2.  Vikram Singh',
-                                    style: GoogleFonts.poppins(
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 18,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              SizedBox(height: 3),
-                              Padding(
-                                padding: const EdgeInsets.only(left: 45),
-                                child: Container(
-                                  height: screenHeight * (24 / 896),
-                                  width: screenWidth * (277 / 414),
-                                  color: Colors.transparent,
-                                  child: Text(
-                                    'Couple Combo Package (Rejuven...',
-                                    style: GoogleFonts.poppins(
-                                      fontWeight: FontWeight.w300,
-                                      fontSize: 14,
-                                      color: Colors.green,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              SizedBox(height: 3),
-                              Padding(
-                                padding: const EdgeInsets.only(left: 45),
-                                child: Container(
-                                  height: screenHeight * (24 / 896),
-                                  width: screenWidth * (222 / 414),
-                                  color: Colors.transparent,
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
-                                    children: [
-                                      Icon(
-                                        Icons.calendar_month,
-                                        size: 13,
-                                        color: Color(0xFFF24E1E),
                                       ),
-                                      Text('31/01/2024'),
-
-                                      Icon(
-                                        Icons.people,
-                                        size: 13,
-                                        color: Color(0xFFF24E1E),
-                                      ),
-                                      Text('jitheesh'),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              SizedBox(height: 10),
-                              Divider(
-                                height: 1,
-                                thickness: 1,
-                                color: Color(0xFFCCCCCC),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(
-                                  left: 45,
-                                  top: 9,
-                                ),
-                                child: GestureDetector(
-                                  onTap: () {},
-                                  child: Container(
-                                    height: screenHeight * (23 / 896),
-                                    width: screenWidth * (277 / 414),
-                                    color: Colors.transparent,
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          'View Booking details',
+                                    ),
+                                    SizedBox(height: 3),
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 45),
+                                      child: Container(
+                                        height: screenHeight * (24 / 896),
+                                        width: screenWidth * (300 / 414),
+                                        color: Colors.transparent,
+                                        child: Text(
+                                          p.branch?.toString() ?? '',
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
                                           style: GoogleFonts.poppins(
                                             fontWeight: FontWeight.w300,
-                                            fontSize: 16,
+                                            fontSize: 14,
+                                            color: Colors.green,
                                           ),
                                         ),
-                                        Icon(
-                                          Icons.arrow_forward_ios_rounded,
-                                          size: 12,
+                                      ),
+                                    ),
+                                    SizedBox(height: 3),
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 45),
+                                      child: Container(
+                                        height: screenHeight * (24 / 896),
+                                        width: screenWidth * (300 / 414),
+                                        color: Colors.transparent,
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceEvenly,
+                                          children: [
+                                            Icon(
+                                              Icons.calendar_month,
+                                              size: 13,
+                                              color: Color(0xFFF24E1E),
+                                            ),
+                                            Text(
+                                              (p.dateAndTime ?? '').toString(),
+                                            ),
+                                            Icon(
+                                              Icons.people,
+                                              size: 13,
+                                              color: Color(0xFFF24E1E),
+                                            ),
+                                            Text(p.user.toString()),
+                                          ],
                                         ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(height: 24),
-                        Container(
-                          width: screenWidth * (350 / 414),
-                          height: screenHeight * (166 / 896),
-                          decoration: BoxDecoration(
-                            color: Color(0xFFF1F1F1),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.only(
-                                  left: 20,
-                                  top: 23,
-                                ),
-                                child: Container(
-                                  height: screenHeight * (29 / 896),
-                                  width: screenWidth * (146 / 414),
-                                  color: Colors.transparent,
-                                  child: Text(
-                                    '3.  Vikram Singh',
-                                    style: GoogleFonts.poppins(
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 18,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              SizedBox(height: 3),
-                              Padding(
-                                padding: const EdgeInsets.only(left: 45),
-                                child: Container(
-                                  height: screenHeight * (24 / 896),
-                                  width: screenWidth * (277 / 414),
-                                  color: Colors.transparent,
-                                  child: Text(
-                                    'Couple Combo Package (Rejuven...',
-                                    style: GoogleFonts.poppins(
-                                      fontWeight: FontWeight.w300,
-                                      fontSize: 14,
-                                      color: Colors.green,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              SizedBox(height: 3),
-                              Padding(
-                                padding: const EdgeInsets.only(left: 45),
-                                child: Container(
-                                  height: screenHeight * (24 / 896),
-                                  width: screenWidth * (222 / 414),
-                                  color: Colors.transparent,
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
-                                    children: [
-                                      Icon(
-                                        Icons.calendar_month,
-                                        size: 13,
-                                        color: Color(0xFFF24E1E),
                                       ),
-                                      Text('31/01/2024'),
-
-                                      Icon(
-                                        Icons.people,
-                                        size: 13,
-                                        color: Color(0xFFF24E1E),
+                                    ),
+                                    SizedBox(height: 10),
+                                    Divider(
+                                      height: 1,
+                                      thickness: 1,
+                                      color: Color(0xFFCCCCCC),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                        left: 45,
+                                        top: 9,
                                       ),
-                                      Text('jitheesh'),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              SizedBox(height: 10),
-                              Divider(
-                                height: 1,
-                                thickness: 1,
-                                color: Color(0xFFCCCCCC),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(
-                                  left: 45,
-                                  top: 9,
-                                ),
-                                child: GestureDetector(
-                                  onTap: () {},
-                                  child: Container(
-                                    height: screenHeight * (23 / 896),
-                                    width: screenWidth * (277 / 414),
-                                    color: Colors.transparent,
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          'View Booking details',
-                                          style: GoogleFonts.poppins(
-                                            fontWeight: FontWeight.w300,
-                                            fontSize: 16,
+                                      child: GestureDetector(
+                                        onTap: () {},
+                                        child: Container(
+                                          height: screenHeight * (23 / 896),
+                                          width: screenWidth * (277 / 414),
+                                          color: Colors.transparent,
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text(
+                                                'View Booking details',
+                                                style: GoogleFonts.poppins(
+                                                  fontWeight: FontWeight.w300,
+                                                  fontSize: 16,
+                                                ),
+                                              ),
+                                              Icon(
+                                                Icons.arrow_forward_ios_rounded,
+                                                size: 12,
+                                              ),
+                                            ],
                                           ),
                                         ),
-                                        Icon(
-                                          Icons.arrow_forward_ios_rounded,
-                                          size: 12,
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(height: 24),
-                        Container(
-                          width: screenWidth * (350 / 414),
-                          height: screenHeight * (166 / 896),
-                          decoration: BoxDecoration(
-                            color: Color(0xFFF1F1F1),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.only(
-                                  left: 20,
-                                  top: 23,
-                                ),
-                                child: Container(
-                                  height: screenHeight * (29 / 896),
-                                  width: screenWidth * (146 / 414),
-                                  color: Colors.transparent,
-                                  child: Text(
-                                    '4.  Vikram Singh',
-                                    style: GoogleFonts.poppins(
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 18,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              SizedBox(height: 3),
-                              Padding(
-                                padding: const EdgeInsets.only(left: 45),
-                                child: Container(
-                                  height: screenHeight * (24 / 896),
-                                  width: screenWidth * (277 / 414),
-                                  color: Colors.transparent,
-                                  child: Text(
-                                    'Couple Combo Package (Rejuven...',
-                                    style: GoogleFonts.poppins(
-                                      fontWeight: FontWeight.w300,
-                                      fontSize: 14,
-                                      color: Colors.green,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              SizedBox(height: 3),
-                              Padding(
-                                padding: const EdgeInsets.only(left: 45),
-                                child: Container(
-                                  height: screenHeight * (24 / 896),
-                                  width: screenWidth * (222 / 414),
-                                  color: Colors.transparent,
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
-                                    children: [
-                                      Icon(
-                                        Icons.calendar_month,
-                                        size: 13,
-                                        color: Color(0xFFF24E1E),
                                       ),
-                                      Text('31/01/2024'),
-
-                                      Icon(
-                                        Icons.people,
-                                        size: 13,
-                                        color: Color(0xFFF24E1E),
-                                      ),
-                                      Text('jitheesh'),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              SizedBox(height: 10),
-                              Divider(
-                                height: 1,
-                                thickness: 1,
-                                color: Color(0xFFCCCCCC),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(
-                                  left: 45,
-                                  top: 9,
-                                ),
-                                child: GestureDetector(
-                                  onTap: () {},
-                                  child: Container(
-                                    height: screenHeight * (23 / 896),
-                                    width: screenWidth * (277 / 414),
-                                    color: Colors.transparent,
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          'View Booking details',
-                                          style: GoogleFonts.poppins(
-                                            fontWeight: FontWeight.w300,
-                                            fontSize: 16,
-                                          ),
-                                        ),
-                                        Icon(
-                                          Icons.arrow_forward_ios_rounded,
-                                          size: 12,
-                                        ),
-                                      ],
                                     ),
-                                  ),
+                                  ],
                                 ),
                               ),
-                            ],
-                          ),
-                        ),
-                      ],
+                            );
+                          },
+                        );
+                      },
                     ),
                   ),
                 ),
@@ -659,7 +339,14 @@ class _PatientsScreenState extends State<PatientsScreen> {
                             borderRadius: BorderRadius.circular(8.52),
                           ),
                         ),
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => RegisterSceen(),
+                            ),
+                          );
+                        },
                         child: Text(
                           'Register now',
                           style: GoogleFonts.poppins(
