@@ -1,5 +1,6 @@
 import 'package:ayurvedic_clinic_app/data/models/branch_model.dart';
 import 'package:ayurvedic_clinic_app/data/models/patient_model.dart';
+import 'package:ayurvedic_clinic_app/data/models/register_patients_model.dart';
 import 'package:ayurvedic_clinic_app/data/models/treatment_model.dart';
 import 'package:dio/dio.dart';
 
@@ -49,12 +50,30 @@ class ApiService {
     }
   }
 
-  Future<bool> updatePatient(Map<String, dynamic> patientData) async {
-    final response = await _dio.post(
-      "PatientUpdate",
-      data: FormData.fromMap(patientData),
-    );
-    return response.statusCode == 200;
+  Future<bool> registerPatient(RegisterPatientRequest request) async {
+    try {
+      final response = await _dio.post(
+        "PatientUpdate",
+        data: FormData.fromMap(request.toJson()),
+      );
+
+      if (response.statusCode == 200) {
+        final status = response.data["status"];
+        if (status == true) {
+          print("Patient registered successfully");
+          return true;
+        } else {
+          print("Registration failed: ${response.data["message"]}");
+          return false;
+        }
+      } else {
+        print("Error: ${response.statusCode} - ${response.statusMessage}");
+        return false;
+      }
+    } catch (e) {
+      print("Register patient error: $e");
+      return false;
+    }
   }
 
   Future<List<Branch>> getBranches() async {
