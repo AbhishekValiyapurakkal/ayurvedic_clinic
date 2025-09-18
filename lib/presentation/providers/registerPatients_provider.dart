@@ -158,6 +158,7 @@ class RegisterPatientProvider with ChangeNotifier {
       _treatmentError = "Unexpected error: $e";
     }
 
+
     _isLoadingTreatments = false;
     notifyListeners();
   }

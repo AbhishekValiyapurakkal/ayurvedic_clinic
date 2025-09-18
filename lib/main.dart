@@ -14,7 +14,7 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  final ApiService apiService = ApiService(); // shared instance
+  final ApiService apiService = ApiService(); 
 
   @override
   Widget build(BuildContext context) {

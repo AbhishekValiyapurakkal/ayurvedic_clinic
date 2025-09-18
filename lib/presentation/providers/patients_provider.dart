@@ -28,6 +28,7 @@ class PatientProvider with ChangeNotifier {
         debugPrint('Patient: id=${p.id}, name=${p.name}, phone=${p.phone}');
       }
 
+
       if (patientsList.isEmpty) {
         _error = "No patients found";
       }
