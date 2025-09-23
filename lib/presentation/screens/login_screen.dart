@@ -195,6 +195,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                       return;
                                     }
 
+                                    final messenger = ScaffoldMessenger.of(context);
+                                    final navigator = Navigator.of(context);
+
                                     final success = await context
                                         .read<AuthProvider>()
                                         .login(email, password);
@@ -209,25 +212,22 @@ class _LoginScreenState extends State<LoginScreen> {
                                           .read<RegisterPatientProvider>();
                                       registerProvider.setToken(token!);
 
-                                      Navigator.pushReplacement(
-                                        context,
+                                      if (!mounted) return;
+
+                                      navigator.pushReplacement(
                                         MaterialPageRoute(
                                           builder: (context) =>
                                               PatientsScreen(),
                                         ),
                                       );
 
-                                      ScaffoldMessenger.of(
-                                        context,
-                                      ).showSnackBar(
+                                      messenger.showSnackBar(
                                         SnackBar(
                                           content: Text('Login success'),
                                         ),
                                       );
                                     } else {
-                                      ScaffoldMessenger.of(
-                                        context,
-                                      ).showSnackBar(
+                                      messenger.showSnackBar(
                                         SnackBar(content: Text('Login failed')),
                                       );
                                     }
