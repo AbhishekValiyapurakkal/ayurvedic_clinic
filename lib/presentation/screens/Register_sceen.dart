@@ -13,7 +13,6 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import 'package:provider/provider.dart';
-import 'package:ayurvedic_clinic_app/presentation/providers/patients_provider.dart';
 
 class RegisterSceen extends StatefulWidget {
   const RegisterSceen({super.key});
@@ -57,7 +56,6 @@ class _RegisterSceenState extends State<RegisterSceen> {
 
   String? selectedlocation;
   Branch? selectedBranch;
-
   String? selectedTreatmentValue;
   String? selectedTreatmentId;
   int selectedMaleCount = 0;
@@ -1537,7 +1535,6 @@ class _RegisterSceenState extends State<RegisterSceen> {
 
                                   Navigator.pop(context);
                                 } catch (e) {
-                                  // Close loading dialog if it's still open
                                   if (Navigator.of(context).canPop()) {
                                     Navigator.of(context).pop();
                                   }

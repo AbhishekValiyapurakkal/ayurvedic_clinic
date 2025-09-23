@@ -31,7 +31,7 @@ class _LoginScreenState extends State<LoginScreen> {
     double screenHeight = screenSize.height;
 
     final auth = context.watch<AuthProvider>();
-    final registerProvider = context.read<RegisterPatientProvider>();
+    context.read<RegisterPatientProvider>();
 
     return Scaffold(
       body: SingleChildScrollView(

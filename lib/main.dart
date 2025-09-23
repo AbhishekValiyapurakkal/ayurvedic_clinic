@@ -14,7 +14,9 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  final ApiService apiService = ApiService(); 
+  final ApiService apiService = ApiService();
+
+  MyApp({super.key}); 
 
   @override
   Widget build(BuildContext context) {

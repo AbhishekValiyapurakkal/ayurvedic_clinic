@@ -39,7 +39,6 @@ class RegisterPatientProvider with ChangeNotifier {
         _dio.options.headers["Authorization"] = "Bearer $savedToken";
       }
     } catch (e) {
-      print("Error initializing token: $e");
     }
   }
 
@@ -54,7 +53,6 @@ class RegisterPatientProvider with ChangeNotifier {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setString('auth_token', token);
     } catch (e) {
-      print("Error persisting token: $e");
     }
   }
 
