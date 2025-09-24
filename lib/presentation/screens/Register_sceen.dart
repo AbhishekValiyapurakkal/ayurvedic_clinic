@@ -31,6 +31,22 @@ class _RegisterSceenState extends State<RegisterSceen> {
   final TextEditingController _balanceamount = TextEditingController();
   final TextEditingController _treatmentdate = TextEditingController();
 
+  Future<void> _selectDate(BuildContext context) async {
+    DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+    );
+
+    if (pickedDate != null) {
+      String formattedDate = DateFormat('yyyy-MM-dd').format(pickedDate);
+      setState(() {
+        _treatmentdate.text = formattedDate;
+      });
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -1327,7 +1343,12 @@ class _RegisterSceenState extends State<RegisterSceen> {
                         height: screenHeight * (50 / 896),
                         child: TextField(
                           controller: _treatmentdate,
+                          readOnly: true,
                           decoration: InputDecoration(
+                            suffix: IconButton(
+                              onPressed: () => _selectDate(context),
+                              icon: Icon(Icons.calendar_month),
+                            ),
                             border: OutlineInputBorder(
                               borderSide: BorderSide(
                                 color: Color(0xFFD9D9D9).withOpacity(0.25),

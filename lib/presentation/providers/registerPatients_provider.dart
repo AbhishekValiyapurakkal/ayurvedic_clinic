@@ -1,8 +1,9 @@
+import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 import 'package:ayurvedic_clinic_app/data/models/register_patients_model.dart';
 import 'package:ayurvedic_clinic_app/data/models/treatment_model.dart';
-import 'package:flutter/material.dart';
-import 'package:dio/dio.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class RegisterPatientProvider with ChangeNotifier {
   final Dio _dio;
