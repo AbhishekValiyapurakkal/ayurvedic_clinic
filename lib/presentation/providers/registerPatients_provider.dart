@@ -39,8 +39,7 @@ class RegisterPatientProvider with ChangeNotifier {
         _token = savedToken;
         _dio.options.headers["Authorization"] = "Bearer $savedToken";
       }
-    } catch (e) {
-    }
+    } catch (e) {}
   }
 
   void setToken(String token) {
@@ -53,8 +52,7 @@ class RegisterPatientProvider with ChangeNotifier {
     try {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setString('auth_token', token);
-    } catch (e) {
-    }
+    } catch (e) {}
   }
 
   Future<void> registerPatient(RegisterPatientRequest request) async {
@@ -79,12 +77,11 @@ class RegisterPatientProvider with ChangeNotifier {
         "PatientUpdate",
         data: request.toJson(),
         options: Options(
-          headers: {
-            "Authorization": "Bearer $_token",
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
+          headers: {"Authorization": "Bearer $_token"},
+          contentType: Headers.formUrlEncodedContentType,
         ),
       );
+
 
       if (response.statusCode == 200) {
         if (response.data["status"] == true) {
@@ -121,13 +118,12 @@ class RegisterPatientProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  
   List<Treatment> _treatments = [];
   List<Treatment> get treatments => _treatments;
-  
+
   String? _treatmentError;
   String? get treatmentError => _treatmentError;
-  
+
   bool _isLoadingTreatments = false;
   bool get isLoadingTreatments => _isLoadingTreatments;
 
@@ -141,12 +137,13 @@ class RegisterPatientProvider with ChangeNotifier {
 
       if (response.statusCode == 200 && response.data != null) {
         final Map<String, dynamic> responseData = response.data;
-        
+
         if (responseData['status'] == true) {
           final List<dynamic> treatmentsData = responseData['treatments'] ?? [];
           _treatments = Treatment.fromJsonList(treatmentsData);
         } else {
-          _treatmentError = responseData['message'] ?? "Failed to load treatments";
+          _treatmentError =
+              responseData['message'] ?? "Failed to load treatments";
         }
       } else {
         _treatmentError = "Failed to load treatments: ${response.statusCode}";
@@ -156,7 +153,6 @@ class RegisterPatientProvider with ChangeNotifier {
     } catch (e) {
       _treatmentError = "Unexpected error: $e";
     }
-
 
     _isLoadingTreatments = false;
     notifyListeners();

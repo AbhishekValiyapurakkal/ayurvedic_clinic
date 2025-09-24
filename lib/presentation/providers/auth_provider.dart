@@ -25,7 +25,6 @@ class AuthProvider with ChangeNotifier {
       _token = token;
       apiService.setToken(token);
       await _persistToken(token);
-      
       notifyListeners();
       return true;
     }

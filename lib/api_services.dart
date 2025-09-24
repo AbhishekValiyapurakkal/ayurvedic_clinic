@@ -65,8 +65,11 @@ class ApiService {
 
       final response = await _dio.post(
         "PatientUpdate",
-        data: FormData.fromMap(request.toJson()),
-        options: Options(headers: {"Authorization": "Bearer $token"}),
+        data: request.toJson(),
+        options: Options(
+          headers: {"Authorization": "Bearer $token"},
+          contentType: Headers.formUrlEncodedContentType,
+        ),
       );
 
       if (response.statusCode == 200) {

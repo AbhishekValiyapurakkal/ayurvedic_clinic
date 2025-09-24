@@ -62,7 +62,7 @@ class _RegisterSceenState extends State<RegisterSceen> {
   String? selectedMinute;
 
   final List<String> hours = List.generate(
-    12,
+    24,
     (index) => (index + 1).toString(),
   );
   final List<String> minutes = List.generate(
@@ -1480,12 +1480,70 @@ class _RegisterSceenState extends State<RegisterSceen> {
                               ),
                               onPressed: () async {
                                 try {
-                                  // Generate PDF first (before API call)
                                   await _generateAndSharePDF();
 
-                                  // Then try to register patient
                                   final provider = context
                                       .read<RegisterPatientProvider>();
+                                  DateTime baseDateTime = DateTime.now();
+                                  if (_treatmentdate.text.isNotEmpty) {
+                                    try {
+                                      baseDateTime = DateFormat(
+                                        'yyyy-MM-dd',
+                                      ).parse(_treatmentdate.text);
+                                    } catch (_) {}
+                                  }
+                                  int hour =
+                                      int.tryParse(selectedHour ?? '') ??
+                                      baseDateTime.hour;
+                                  int minute =
+                                      int.tryParse(selectedMinute ?? '') ??
+                                      baseDateTime.minute;
+                                  if (hour < 0 || hour > 23) {
+                                    hour = baseDateTime.hour;
+                                  }
+                                  if (minute < 0 || minute > 59) {
+                                    minute = baseDateTime.minute;
+                                  }
+                                  final DateTime combined = DateTime(
+                                    baseDateTime.year,
+                                    baseDateTime.month,
+                                    baseDateTime.day,
+                                    hour,
+                                    minute,
+                                  );
+                                  final String formattedDateTime = DateFormat(
+                                    'dd/MM/yyyy-hh:mm a',
+                                  ).format(combined);
+
+                                  final String maleIds =
+                                      (selectedMaleCount > 0 &&
+                                          selectedTreatmentId != null)
+                                      ? selectedTreatmentId!
+                                      : '';
+                                  final String femaleIds =
+                                      (selectedFemaleCount > 0 &&
+                                          selectedTreatmentId != null)
+                                      ? selectedTreatmentId!
+                                      : '';
+
+                                  final String treatmentsCsv =
+                                      selectedTreatmentId ?? '';
+
+                                  if (_name.text.trim().isEmpty ||
+                                      _whatsappnumber.text.trim().isEmpty ||
+                                      _address.text.trim().isEmpty ||
+                                      (treatmentsCsv.isEmpty)) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          "Please fill all required fields and select a treatment.",
+                                        ),
+                                        backgroundColor: Colors.red,
+                                      ),
+                                    );
+                                    return;
+                                  }
+
                                   final request = RegisterPatientRequest(
                                     name: _name.text.trim(),
                                     excecutive: "",
@@ -1503,16 +1561,14 @@ class _RegisterSceenState extends State<RegisterSceen> {
                                     balanceAmount:
                                         double.tryParse(_balanceamount.text) ??
                                         0,
-                                    dateAndTime: DateTime.now()
-                                        .toIso8601String(),
+                                    dateAndTime: formattedDateTime,
                                     id: "",
-                                    male: selectedMaleCount.toString(),
-                                    female: selectedFemaleCount.toString(),
-                                    branch: selectedBranch?.name ?? "",
-                                    treatments: selectedTreatmentId ?? "",
+                                    male: maleIds,
+                                    female: femaleIds,
+                                    branch: selectedBranch?.id.toString() ?? "",
+                                    treatments: treatmentsCsv,
                                   );
 
-                                  // Show loading for API call only
                                   showDialog(
                                     context: context,
                                     barrierDismissible: false,
@@ -1530,7 +1586,6 @@ class _RegisterSceenState extends State<RegisterSceen> {
 
                                   await provider.registerPatient(request);
 
-                                  // Close loading dialog
                                   Navigator.of(context).pop();
 
                                   if (provider.success) {
@@ -1568,7 +1623,6 @@ class _RegisterSceenState extends State<RegisterSceen> {
                                     ),
                                   );
 
-                                  print("Error details: $e");
                                 }
                               },
 

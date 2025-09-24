@@ -9,11 +9,11 @@ class RegisterPatientRequest {
   final double advanceAmount;
   final double balanceAmount;
   final String dateAndTime;
-  final String id; 
-  final String male; 
-  final String female; 
+  final String id;
+  final String male;
+  final String female;
   final String branch;
-  final String treatments; 
+  final String treatments;
 
   RegisterPatientRequest({
     required this.name,
@@ -40,10 +40,10 @@ class RegisterPatientRequest {
       "payment": payment,
       "phone": phone,
       "address": address,
-      "total_amount": totalAmount,
-      "discount_amount": discountAmount,
-      "advance_amount": advanceAmount,
-      "balance_amount": balanceAmount,
+      "total_amount": totalAmount.toString(),
+      "discount_amount": discountAmount.toString(),
+      "advance_amount": advanceAmount.toString(),
+      "balance_amount": balanceAmount.toString(),
       "date_nd_time": dateAndTime,
       "id": id,
       "male": male,
