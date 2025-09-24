@@ -1,16 +1,42 @@
-# ayurvedic_clinic_app
+# Ayurvedic Clinic App
 
-A new Flutter project.
+Ayurvedic Clinic App is a Flutter-based mobile application designed for managing appointments, patient records, and treatments in an Ayurvedic clinic. The app allows users to interact seamlessly with the clinic's backend API, book appointments, and generate PDFs for reports which can be shared with patients.
+
+---
+
+## Features
+
+- **User Authentication**  
+  Register and login using email/password.
+
+- **Patient Management**  
+  Add, view, and manage patient details.
+
+- **Appointment Booking**  
+  Schedule appointments and view appointment history.
+
+- **Treatment Records**  
+  Add and manage treatment details for patients.
+
+- **PDF Generation**  
+  Generate treatment reports or invoices as PDFs and share via WhatsApp, email, or other apps.
+
+- **API Integration**  
+  Fetch and post data to backend APIs securely.
+
+---
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+### Prerequisites
 
-A few resources to get you started if this is your first Flutter project:
+- Flutter SDK installed ([Flutter installation guide](https://flutter.dev/docs/get-started/install))
+- Android Studio or VS Code
+- Internet connection for API requests
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+### Installation
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+1. Clone the repository:
+
+```bash
+git clone https://github.com/AbhishekValiyapurakkal/ayurvedic_clinic.git
