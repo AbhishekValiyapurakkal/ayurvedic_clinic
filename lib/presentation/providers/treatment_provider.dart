@@ -1,4 +1,4 @@
-import 'package:ayurvedic_clinic_app/api_services.dart';
+import 'package:ayurvedic_clinic_app/services/api_services.dart';
 import 'package:ayurvedic_clinic_app/data/models/treatment_model.dart';
 import 'package:flutter/material.dart';
 
